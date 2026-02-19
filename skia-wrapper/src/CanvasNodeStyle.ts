@@ -1,4 +1,4 @@
-import { RequiredLabelOptions, LabelOptions } from "./LabelOptions";
+import { type RequiredLabelOptions, type LabelOptions } from "./LabelOptions";
 
 export type CanvasNodeStyle = {
     strokeColor?: number[];

@@ -1,6 +1,6 @@
-import { CanvasNode } from "./CanvasNode";
+import { type CanvasNode } from "./CanvasNode";
 
-export function useEventListeners(skiaContext) {
+export function useEventListeners(skiaContext: any) {
     const { canvasEl } = skiaContext;
 
     const listeners = new Map<String, { event: string; listener: (e: any) => void }>();

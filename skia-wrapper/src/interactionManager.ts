@@ -1,4 +1,4 @@
-export function useInteractionManager(skiaContext, key: string, callerId: string) {
+export function useInteractionManager(skiaContext: any, key: string, callerId: string) {
     if (!skiaContext.interactions[key]) {
         skiaContext.interactions[key] = {
             callerId: null

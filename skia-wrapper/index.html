@@ -3,12 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CanvasKit Zoom to Cursor</title>
-    <script src="https://unpkg.com/canvaskit-wasm@0.39.1/bin/canvaskit.js"></script>
-    <script>
-        window.CanvasKitInit = CanvasKitInit;
-    </script>
-    <!-- <script src="./panZoom.js"></script> -->
     <style>
         body {
             margin: 0;
@@ -37,12 +31,12 @@
     </div>
 
     <script type="module">
-        import { useSkia } from './dist/skia.js';
-        import { usePanZoomWorld } from './dist/world/panZoomWorld.js';
-        import { useStaticWorld } from './dist/world/staticWorld.js';
-        import { useNodes } from './dist/nodes.js';
-        import { useEventListeners } from './dist/eventListeners.js';
-        import { useDragDrop } from './dist/dragDrop.js';
+        import { useSkia } from './src/skia.ts';
+        import { usePanZoomWorld } from './src/world/panZoomWorld.ts';
+        import { useStaticWorld } from './src/world/staticWorld.ts';
+        import { useNodes } from './src/nodes.ts';
+        import { useEventListeners } from './src/eventListeners.ts';
+        import { useDragDrop } from './src/dragDrop.ts';
 
         (async () => {
             const skiaContext = await useSkia('#canvas');
@@ -66,7 +60,8 @@
 
             const { nodeContext, addCircle } = useNodes(skiaContext);
             await nodeContext.addFont('Roboto', 'https://cdn.skia.org/misc/Roboto-Regular.ttf');
-
+            
+            console.log(skiaContext);
             skiaContext.canvasEl.addEventListener('dblclick', () => {
                 nodeContext.createNode(
                     addCircle(skiaContext.mouse.worldX, skiaContext.mouse.worldY, 50),

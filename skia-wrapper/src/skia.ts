@@ -1,4 +1,7 @@
-export async function useSkia(canvasQuerySelector) {
+import CanvasKitInit from "canvaskit-wasm";
+import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
+
+export async function useSkia(canvasQuerySelector: string) {
     const CanvasKit = await getCanvasKit();
     const canvasEl = getCanvasEl();
     const surface = await getSurface();
@@ -9,13 +12,13 @@ export async function useSkia(canvasQuerySelector) {
     drawFrame();
 
     async function getCanvasKit() {
-        return await (window as any).CanvasKitInit({
-            locateFile: (file) => 'https://unpkg.com/canvaskit-wasm@0.39.1/bin/' + file,
+        return await CanvasKitInit({
+            locateFile: () => wasmUrl
         });
     }
 
     function getCanvasEl(): HTMLCanvasElement {
-        const canvasEl = document.querySelector(canvasQuerySelector);
+        const canvasEl = document.querySelector<HTMLCanvasElement>(canvasQuerySelector);
 
         if (!canvasEl) {
             throw new Error('Could not find canvas');
@@ -25,7 +28,7 @@ export async function useSkia(canvasQuerySelector) {
     }
 
     async function getSurface(): Promise<any> {
-        const surface = CanvasKit.MakeCanvasSurface('canvas');
+        const surface = CanvasKit.MakeWebGLCanvasSurface('canvas');
         if (!surface) {
             throw new Error('Could not make surface');
         }

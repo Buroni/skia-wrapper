@@ -1,7 +1,7 @@
-import { CanvasNode } from "./CanvasNode";
-import { InteractionKeys, useInteractionManager } from "./interactionManager.js";
+import { type CanvasNode } from "./CanvasNode";
+import { InteractionKeys, useInteractionManager } from "./interactionManager.ts";
 
-export function useDragDrop(skiaContext) {
+export function useDragDrop(skiaContext: any) {
     const DRAG_DROP_KEY = "DRAG_DROP_KEY";
     const {
         setInteraction,

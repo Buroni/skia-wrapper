@@ -1,8 +1,8 @@
-import { RequiredLabelOptions } from './LabelOptions';
-import { CanvasNode, CanvasNodePathData } from './CanvasNode';
-import { CanvasNodeStyle, RequiredCanvasNodeStyle } from './CanvasNodeStyle';
+import { type RequiredLabelOptions } from './LabelOptions';
+import { type CanvasNode, type CanvasNodePathData } from './CanvasNode';
+import { type CanvasNodeStyle, type RequiredCanvasNodeStyle } from './CanvasNodeStyle';
 
-export function useNodes(skiaContext) {
+export function useNodes(skiaContext: any) {
     const { surface, CanvasKit, addons } = skiaContext;
     const fonts = {};
 

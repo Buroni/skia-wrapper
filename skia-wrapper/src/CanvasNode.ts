@@ -1,4 +1,4 @@
-import { RequiredCanvasNodeStyle } from "./CanvasNodeStyle";
+import { type RequiredCanvasNodeStyle } from "./CanvasNodeStyle";
 
 export type CanvasNodePathData = {
     path: any;
