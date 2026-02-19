@@ -1,4 +1,4 @@
-import { type CanvasNode } from "./CanvasNode";
+import { type CanvasNode } from "./types/CanvasNode";
 
 export function useEventListeners(skiaContext: any) {
     const { canvasEl } = skiaContext;

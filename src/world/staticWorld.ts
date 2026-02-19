@@ -1,6 +1,6 @@
-import { useMouse } from "./mouse.js";
+import { useMouse } from "./mouse";
 
-export function useStaticWorld(skiaContext) {
+export function useStaticWorld(skiaContext: any) {
     const mouseContext = useMouse(skiaContext);
 
     const { canvasEl } = skiaContext;

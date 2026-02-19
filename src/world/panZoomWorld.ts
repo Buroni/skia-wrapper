@@ -1,7 +1,7 @@
-import { InteractionKeys, useInteractionManager } from "../interactionManager.js";
-import { useMouse } from "./mouse.js";
+import { InteractionKeys, useInteractionManager } from "../interactionManager";
+import { useMouse } from "./mouse";
 
-export function usePanZoomWorld(skiaContext) {
+export function usePanZoomWorld(skiaContext: any) {
     const mouseContext = useMouse(skiaContext);
 
     const { canvasEl, surface, addons } = skiaContext;
