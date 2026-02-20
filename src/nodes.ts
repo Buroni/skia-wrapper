@@ -1,7 +1,7 @@
 import { type LabelOptions } from "./types/LabelOptions";
 import { type CanvasNode, type CanvasNodePathData } from "./types/CanvasNode";
 import { type CanvasNodeStyle } from "./types/CanvasNodeStyle";
-import { type Path, type Paragraph, type TextAlign, type FontMgr, type ParagraphStyle, type Paint } from "canvaskit-wasm"
+import { type Path, type Paragraph, type TextAlign, type FontMgr, type ParagraphStyle } from "canvaskit-wasm"
 import type { ParagraphBounds } from "./types/ParagraphBounds";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type NodeContext } from "./types/context/NodeContext";
@@ -17,6 +17,9 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
     const nodePaintContext = useNodePaint(skiaContext);
 
     const { surface, CanvasKit, addons } = skiaContext;
+
+    const canvas = surface.getCanvas();
+
     const fonts: Record<string, FontMgr> = {};
 
     async function addFont(name: string, url: string): Promise<void> {
@@ -41,14 +44,23 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             labelOptions
         };
 
-        let paragraphStyle: ParagraphStyle;
+        let paragraphStyle: ParagraphStyle | undefined;
         if (node.labelOptions) {
             paragraphStyle = getParagraphStyle(node.labelOptions);
         }
 
-        const drawFrame = () => {
+        const drawFrame = makeDrawFrame(node, paragraphStyle);
+
+        addons.push(drawFrame);
+
+        skiaContext.nodes.push(node);
+
+        return node;
+    }
+
+    function makeDrawFrame(node: CanvasNode, paragraphStyle?: ParagraphStyle): () => void {
+        return () => {
             const disposables: any[] = [];
-            const canvas = surface.getCanvas();
 
             canvas.save();
             canvas.translate(node.pathData.cx, node.pathData.cy);
@@ -65,28 +77,30 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
                 canvas.drawPath(node.pathData.path, fillPaint);
             }
 
-            if (node.labelOptions) {
-                const fontMgr = fonts[node.labelOptions.fontName];
-                const builder = addDisposable(() => CanvasKit.ParagraphBuilder.Make(paragraphStyle, fontMgr), disposables);
-                builder.addText(node.labelOptions.text);
-
-                const paragraph = addDisposable(() => builder.build(), disposables);
-                const paragraphWidth = node.labelOptions.width === "fit" ? getParagraphFitWidth(node.pathData.path) : node.labelOptions.width;
-                paragraph.layout(paragraphWidth);
-                const paragraphBounds = getParagraphBounds(paragraph, node.pathData.path);
-                canvas.drawParagraph(paragraph, paragraphBounds.x, paragraphBounds.y);
+            if (paragraphStyle) {
+                drawLabel(node, paragraphStyle, disposables);
             }
 
             canvas.restore();
 
             disposables.forEach(disposable => disposable.delete());
-        };
+        }
+    }
 
-        addons.push(drawFrame);
+    function drawLabel(node: CanvasNode, paragraphStyle: ParagraphStyle, disposables: any[]): void {
+        if (!node.labelOptions) {
+            throw new Error('labelOptions must be defined on node');
+        }
 
-        skiaContext.nodes.push(node);
+        const fontMgr = fonts[node.labelOptions.fontName];
+        const builder = addDisposable(() => CanvasKit.ParagraphBuilder.Make(paragraphStyle, fontMgr), disposables);
+        builder.addText(node.labelOptions.text);
 
-        return node;
+        const paragraph = addDisposable(() => builder.build(), disposables);
+        const paragraphWidth = node.labelOptions.width === "fit" ? getParagraphFitWidth(node.pathData.path) : node.labelOptions.width;
+        paragraph.layout(paragraphWidth);
+        const paragraphBounds = getParagraphBounds(paragraph, node.pathData.path);
+        canvas.drawParagraph(paragraph, paragraphBounds.x, paragraphBounds.y);
     }
 
     function getDefaultNodeStyle(nodeStyle: CanvasNodeStyle | undefined): CanvasNodeStyle {
