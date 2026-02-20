@@ -40,13 +40,17 @@
         import { useEventListeners } from "./src/eventListeners.ts";
         import { useDragDrop } from "./src/dragDrop.ts";
         import { useNodePaths } from "./src/nodePaths.ts";
+        import { useFonts } from "./src/fonts.ts";
 
         (async () => {
             const skiaContext = await useSkia("#canvas");
+
+            const fontsContext = await useFonts(skiaContext);
+            await fontsContext.addFont("Roboto", "https://cdn.skia.org/misc/Roboto-Regular.ttf");
+            
             const { circle } = useNodePaths(skiaContext);
 
             usePanZoomWorld(skiaContext);
-            // useStaticWorld(skiaContext);
             useDragDrop(skiaContext);
 
             const listenerContext = useEventListeners(skiaContext);
@@ -63,7 +67,6 @@
             );
 
             const nodeContext = useNodes(skiaContext);
-            await nodeContext.addFont("Roboto", "https://cdn.skia.org/misc/Roboto-Regular.ttf");
 
             skiaContext.canvasEl.addEventListener("dblclick", () => {
                 nodeContext.createNode(

@@ -68,6 +68,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
             worldX: 0,
             worldY: 0
         },
-        nodes: []
+        nodes: [],
+        fonts: {}
     }
 }

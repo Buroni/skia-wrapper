@@ -1,4 +1,4 @@
-import { type Surface, type CanvasKit } from "canvaskit-wasm";
+import { type Surface, type CanvasKit, type FontMgr } from "canvaskit-wasm";
 import { type CanvasNode } from "../CanvasNode";
 
 export type Addon = () => void;
@@ -14,5 +14,6 @@ export type SkiaContext = {
         worldX: number,
         worldY: number
     },
-    nodes: CanvasNode[]
+    nodes: CanvasNode[],
+    fonts: Record<string, FontMgr>
 }
