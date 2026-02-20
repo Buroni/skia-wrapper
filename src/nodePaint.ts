@@ -4,36 +4,36 @@ import { type SkiaContext } from "./types/context/SkiaContext";
 import { type Paint } from "canvaskit-wasm";
 
 const DEFAULT_STROKE_STYLE = {
-    strokeColor: [0, 0, 0, 1],
-    strokeWidth: 4
+    color: [0, 0, 0, 1],
+    width: 4
 };
 
 const DEFAULT_FILL_STYLE = {
-    fillColor: [1, 1, 1, 1]
+    color: [1, 1, 1, 1]
 }
 
 export function useNodePaint(skiaContext: SkiaContext): NodePaintContext {
     const { CanvasKit } = skiaContext;
 
     function setStroke({
-        strokeColor = DEFAULT_STROKE_STYLE.strokeColor,
-        strokeWidth = DEFAULT_STROKE_STYLE.strokeWidth }: CanvasNodeStrokeStyle
+        color = DEFAULT_STROKE_STYLE.color,
+        width = DEFAULT_STROKE_STYLE.width }: CanvasNodeStrokeStyle
     ): Paint {
         const strokePaint = new CanvasKit.Paint();
         strokePaint.setStyle(CanvasKit.PaintStyle.Stroke);
 
-        strokePaint.setColor(CanvasKit.Color4f(strokeColor[0], strokeColor[1], strokeColor[2], strokeColor[3]));
-        strokePaint.setStrokeWidth(strokeWidth);
+        strokePaint.setColor(CanvasKit.Color4f(color[0], color[1], color[2], color[3]));
+        strokePaint.setStrokeWidth(width);
         strokePaint.setAntiAlias(true);
 
         return strokePaint;
     }
 
-    function setFill({ fillColor = DEFAULT_FILL_STYLE.fillColor }): Paint {
+    function setFill({ color = DEFAULT_FILL_STYLE.color }): Paint {
         const fillPaint = new CanvasKit.Paint();
         fillPaint.setStyle(CanvasKit.PaintStyle.Fill);
 
-        fillPaint.setColor(CanvasKit.Color4f(fillColor[0], fillColor[1], fillColor[2], fillColor[3]));
+        fillPaint.setColor(CanvasKit.Color4f(color[0], color[1], color[2], color[3]));
         fillPaint.setAntiAlias(true);
 
         return fillPaint;

@@ -1,13 +1,13 @@
 export type CanvasNodeStrokeStyle = {
-    strokeColor?: number[];
-    strokeWidth?: number;
+    color?: number[];
+    width?: number;
 };
 
 export type CanvasNodeFillStyle = {
-    fillColor?: number[];
+    color?: number[];
 };
 
 export type CanvasNodeStyle = {
-    strokeStyle?: CanvasNodeStrokeStyle;
-    fillStyle?: CanvasNodeFillStyle;
+    stroke?: CanvasNodeStrokeStyle;
+    fill?: CanvasNodeFillStyle;
 };

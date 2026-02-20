@@ -58,8 +58,8 @@
                 "mousemove",
                 skiaContext.nodes,
                 (e, node, isInside) => {
-                    node.style.strokeStyle.strokeWidth = isInside ? 6 : 4;
-                    node.style.strokeStyle.strokeColor = isInside ? [255, 0, 0, 0.5] : [0, 0, 0, 1];
+                    node.style.stroke.width = isInside ? 6 : 4;
+                    node.style.stroke.color = isInside ? [255, 0, 0, 0.5] : [0, 0, 0, 1];
                 },
                 (e, isInside) => {
                     skiaContext.canvasEl.style.cursor = isInside ? "pointer" : "default";

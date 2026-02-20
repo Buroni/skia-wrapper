@@ -46,15 +46,15 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             canvas.save();
             canvas.translate(node.pathData.cx, node.pathData.cy);
 
-            if (node.style.strokeStyle) {
-                const { strokeStyle } = node.style;
-                const strokePaint = addDisposable(() => nodePaintContext.setStroke(strokeStyle), disposables);
+            if (node.style.stroke) {
+                const { stroke } = node.style;
+                const strokePaint = addDisposable(() => nodePaintContext.setStroke(stroke), disposables);
                 canvas.drawPath(node.pathData.path, strokePaint);
             }
 
-            if (node.style.fillStyle) {
-                const { fillStyle } = node.style;
-                const fillPaint = addDisposable(() => nodePaintContext.setFill(fillStyle), disposables);
+            if (node.style.fill) {
+                const { fill } = node.style;
+                const fillPaint = addDisposable(() => nodePaintContext.setFill(fill), disposables);
                 canvas.drawPath(node.pathData.path, fillPaint);
             }
 
@@ -73,12 +73,12 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             nodeStyle = {};
         }
 
-        if (!nodeStyle.strokeStyle) {
-            nodeStyle.strokeStyle = {};
+        if (!nodeStyle.stroke) {
+            nodeStyle.stroke = {};
         }
 
-        if (!nodeStyle.fillStyle) {
-            nodeStyle.fillStyle = {};
+        if (!nodeStyle.fill) {
+            nodeStyle.fill = {};
         }
 
         return nodeStyle;
