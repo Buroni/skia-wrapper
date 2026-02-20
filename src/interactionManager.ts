@@ -1,4 +1,7 @@
-export function useInteractionManager(skiaContext: any, key: string, callerId: string) {
+import { type SkiaContext } from "./types/SkiaContext";
+
+// TODO - type InteractionManagetContext
+export function useInteractionManager(skiaContext: SkiaContext, key: string, callerId: string) {
     if (!skiaContext.interactions[key]) {
         skiaContext.interactions[key] = {
             callerId: null

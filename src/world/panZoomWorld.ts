@@ -1,7 +1,8 @@
 import { InteractionKeys, useInteractionManager } from "../interactionManager";
+import { type SkiaContext } from "../types/SkiaContext";
 import { useMouse } from "./mouse";
 
-export function usePanZoomWorld(skiaContext: any) {
+export function usePanZoomWorld(skiaContext: SkiaContext) {
     const mouseContext = useMouse(skiaContext);
 
     const { canvasEl, surface, addons } = skiaContext;
@@ -37,7 +38,7 @@ export function usePanZoomWorld(skiaContext: any) {
 
     function setupEventListeners() {
         // Zoom with mouse wheel
-        canvasEl.addEventListener('wheel', (e) => {
+        canvasEl.addEventListener('wheel', (e: WheelEvent) => {
             e.preventDefault();
 
             const mouseX = mouseContext.mouseX(e);
@@ -63,7 +64,7 @@ export function usePanZoomWorld(skiaContext: any) {
         });
 
         // Pan with mouse drag
-        canvasEl.addEventListener('mousedown', async (e) => {
+        canvasEl.addEventListener('mousedown', async (e: MouseEvent) => {
             if (!hasInteraction()) {
                 setInteraction();
                 isPanning = true;
@@ -72,7 +73,7 @@ export function usePanZoomWorld(skiaContext: any) {
             }
         });
 
-        canvasEl.addEventListener('mousemove', (e) => {
+        canvasEl.addEventListener('mousemove', (e: MouseEvent) => {
             if (isPanning) {
                 const dx = e.clientX - lastMouseX;
                 const dy = e.clientY - lastMouseY;

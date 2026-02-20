@@ -1,17 +1,18 @@
-import CanvasKitInit from "canvaskit-wasm";
+import CanvasKitInit, { type Surface, type CanvasKit } from "canvaskit-wasm";
 import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
+import { type Addon, type Interactions, type SkiaContext } from "./types/SkiaContext";
 
-export async function useSkia(canvasQuerySelector: string) {
+export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext> {
     const CanvasKit = await getCanvasKit();
     const canvasEl = getCanvasEl();
     const surface = await getSurface();
 
-    const addons = [];
-    const interactions = {};
+    const addons: Addon[] = [];
+    const interactions: Interactions = {};
 
     drawFrame();
 
-    async function getCanvasKit() {
+    async function getCanvasKit(): Promise<CanvasKit> {
         return await CanvasKitInit({
             locateFile: () => wasmUrl
         });
@@ -27,7 +28,7 @@ export async function useSkia(canvasQuerySelector: string) {
         return canvasEl;
     }
 
-    async function getSurface(): Promise<any> {
+    async function getSurface(): Promise<Surface> {
         const surface = CanvasKit.MakeWebGLCanvasSurface('canvas');
         if (!surface) {
             throw new Error('Could not make surface');

@@ -1,15 +1,19 @@
-import { type RequiredLabelOptions } from './types/LabelOptions';
-import { type CanvasNode, type CanvasNodePathData } from './types/CanvasNode';
-import { type CanvasNodeStyle, type RequiredCanvasNodeStyle } from './types/CanvasNodeStyle';
+import { type RequiredLabelOptions } from "./types/LabelOptions";
+import { type CanvasNode, type CanvasNodePathData } from "./types/CanvasNode";
+import { type CanvasNodeStyle, type RequiredCanvasNodeStyle } from "./types/CanvasNodeStyle";
+import { type Path, type Paragraph, type TextAlign } from "canvaskit-wasm"
+import type { ParagraphBounds } from "./types/ParagraphBounds";
+import { type SkiaContext } from "./types/SkiaContext";
 
-export function useNodes(skiaContext: any) {
+// TODO - type NodeContext
+export function useNodes(skiaContext: SkiaContext) {
     const { surface, CanvasKit, addons } = skiaContext;
     const fonts = {};
 
     async function addFont(name: string, url: string): Promise<void> {
         const response = await fetch(url);
         const arrBuffer = await response.arrayBuffer();
-        const fontMgr = CanvasKit.FontMgr.FromData([arrBuffer]);
+        const fontMgr = CanvasKit.FontMgr.FromData(arrBuffer);
         fonts[name] = fontMgr;
     }
 
@@ -19,8 +23,8 @@ export function useNodes(skiaContext: any) {
             strokeWidth: 4,
             ...nodeStyle,
             labelOptions: {
-                width: 'fit',
-                textAlign: 'center',
+                width: "fit",
+                textAlign: "center",
                 ...nodeStyle.labelOptions
             }
         }
@@ -54,9 +58,9 @@ export function useNodes(skiaContext: any) {
             builder.addText(node.style.labelOptions.text);
 
             const paragraph = addDisposable(() => builder.build(), disposables);
-            const paragraphWidth = node.style.labelOptions.width === 'fit' ? getParagraphFitWidth(node.pathData.path) : node.style.labelOptions.width;
+            const paragraphWidth = node.style.labelOptions.width === "fit" ? getParagraphFitWidth(node.pathData.path) : node.style.labelOptions.width;
             paragraph.layout(paragraphWidth);
-            const paragraphBounds = getParagraphXY(paragraph, node.pathData.path);
+            const paragraphBounds = getParagraphBounds(paragraph, node.pathData.path);
             canvas.drawParagraph(paragraph, paragraphBounds.x, paragraphBounds.y);
 
             canvas.restore();
@@ -88,18 +92,20 @@ export function useNodes(skiaContext: any) {
         });
     }
 
-    function toSkiaTextAlign(textAlign: string): any {
+    function toSkiaTextAlign(textAlign: string): TextAlign {
         switch (textAlign) {
-            case 'left':
+            case "left":
                 return CanvasKit.TextAlign.Left;
-            case 'right':
+            case "right":
                 return CanvasKit.TextAlign.Right;
-            case 'center':
+            case "center":
                 return CanvasKit.TextAlign.Center;
         }
+
+        throw new Error(`Can't map value '${textAlign} to TextAlign'`);
     }
 
-    function getParagraphFitWidth(path: any): any {
+    function getParagraphFitWidth(path: Path): number {
         const bounds = path.getBounds();
 
         const left = bounds[0];
@@ -109,7 +115,7 @@ export function useNodes(skiaContext: any) {
         return width;
     }
 
-    function getParagraphXY(paragraph: any, path: any): any {
+    function getParagraphBounds(paragraph: Paragraph, path: Path): ParagraphBounds {
         const bounds = path.getBounds();
 
         const left = bounds[0];

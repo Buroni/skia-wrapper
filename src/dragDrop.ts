@@ -1,7 +1,8 @@
 import { type CanvasNode } from "./types/CanvasNode";
 import { InteractionKeys, useInteractionManager } from "./interactionManager";
+import { type SkiaContext } from "./types/SkiaContext";
 
-export function useDragDrop(skiaContext: any) {
+export function useDragDrop(skiaContext: SkiaContext): void {
     const DRAG_DROP_KEY = "DRAG_DROP_KEY";
     const {
         setInteraction,
@@ -29,7 +30,7 @@ export function useDragDrop(skiaContext: any) {
     function setupEventListeners() {
         const { canvasEl } = skiaContext;
 
-        canvasEl.addEventListener('pointerdown', async (e) => {
+        canvasEl.addEventListener('pointerdown', async () => {
             if (hasInteraction()) {
                 return;
             }
@@ -43,14 +44,14 @@ export function useDragDrop(skiaContext: any) {
             }
         });
 
-        canvasEl.addEventListener('pointermove', e => {
+        canvasEl.addEventListener('pointermove', () => {
             if (dragging) {
                 dragging.pathData.cx = skiaContext.mouse.worldX - dx;
                 dragging.pathData.cy = skiaContext.mouse.worldY - dy;
             }
         });
 
-        canvasEl.addEventListener('pointerup', (e) => {
+        canvasEl.addEventListener('pointerup', () => {
             dragging = null;
             releaseInteraction();
         });

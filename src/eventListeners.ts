@@ -1,22 +1,24 @@
 import { type CanvasNode } from "./types/CanvasNode";
+import { type SkiaContext } from "./types/SkiaContext";
 
-export function useEventListeners(skiaContext: any) {
+// TODO - type EventListenersContext
+export function useEventListeners(skiaContext: SkiaContext) {
     const { canvasEl } = skiaContext;
 
-    const listeners = new Map<String, { event: string; listener: (e: any) => void }>();
+    const listeners = new Map<String, { event: string; listener: (e: Event) => void }>();
 
     function addEventListener(
         event: string,
         items: CanvasNode | CanvasNode[],
-        fn: (e: any, item: CanvasNode, pointerIsInsideItem: boolean) => void,
-        unionFn?: (e: any, pointerIsInsideItems: boolean) => void
+        fn: (e: Event, item: CanvasNode, pointerIsInsideItem: boolean) => void,
+        unionFn?: (e: Event, pointerIsInsideItems: boolean) => void
     ): string {
         if (!Array.isArray(items)) {
             items = [items];
         }
 
-        const listener = (e) => {
-            const collisionFlags: number[] = [];
+        const listener = (e: Event) => {
+            const collisionFlags: boolean[] = [];
 
             for (const item of items) {
                 const pointerIsInsideItem = item.pathData.path.contains(
@@ -39,17 +41,19 @@ export function useEventListeners(skiaContext: any) {
     }
 
     function removeEventListener(listenerId: string) {
-        const { event, listener } = listeners.get(listenerId);
+        const listenerEntry = listeners.get(listenerId);
 
-        if (!listener) {
-            throw new Error(`Listener with ID ${listenerId} not found`);
+        if (!listenerEntry) {
+            throw new Error(`No listener with key '${listenerId}'`);
         }
+
+        const { event, listener } = listenerEntry;
 
         canvasEl.removeEventListener(event, listener);
         listeners.delete(listenerId);
     }
 
-    function createListenerId(event: string, listener: (e: any) => void): string {
+    function createListenerId(event: string, listener: (e: Event) => void): string {
         const listenerId = crypto.randomUUID();
         listeners.set(listenerId, { event, listener });
 

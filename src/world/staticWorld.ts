@@ -1,6 +1,7 @@
+import { type SkiaContext } from "../types/SkiaContext";
 import { useMouse } from "./mouse";
 
-export function useStaticWorld(skiaContext: any) {
+export function useStaticWorld(skiaContext: SkiaContext) {
     const mouseContext = useMouse(skiaContext);
 
     const { canvasEl } = skiaContext;
@@ -8,7 +9,7 @@ export function useStaticWorld(skiaContext: any) {
     setupEventListeners();
 
     function setupEventListeners() {
-        canvasEl.addEventListener('mousemove', (e) => {
+        canvasEl.addEventListener('mousemove', (e: MouseEvent) => {
             skiaContext.mouse.worldX = mouseContext.mouseX(e);
             skiaContext.mouse.worldY = mouseContext.mouseY(e);
         });

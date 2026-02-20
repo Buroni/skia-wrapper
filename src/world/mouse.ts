@@ -1,4 +1,7 @@
-export function useMouse(skiaContext) {
+import { type SkiaContext } from "../types/SkiaContext";
+
+// TODO - type MouseContext
+export function useMouse(skiaContext: SkiaContext) {
     const { canvasEl } = skiaContext;
 
     let boundingRect: DOMRect;
@@ -12,11 +15,11 @@ export function useMouse(skiaContext) {
         boundingRect = canvasEl.getBoundingClientRect()
     }
 
-    function mouseX(e) {
+    function mouseX(e: MouseEvent) {
         return e.clientX - boundingRect.left;
     }
 
-    function mouseY(e) {
+    function mouseY(e: MouseEvent) {
         return e.clientY - boundingRect.top;
     }
 
