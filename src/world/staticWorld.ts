@@ -1,4 +1,4 @@
-import { type SkiaContext } from "../types/SkiaContext";
+import { type SkiaContext } from "../types/context/SkiaContext";
 import { useMouse } from "./mouse";
 
 export function useStaticWorld(skiaContext: SkiaContext) {

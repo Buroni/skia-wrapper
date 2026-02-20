@@ -1,5 +1,5 @@
 import { type Surface, type CanvasKit } from "canvaskit-wasm";
-import { type CanvasNode } from "./CanvasNode";
+import { type CanvasNode } from "../CanvasNode";
 
 export type Addon = () => void;
 export type Interactions = Record<string, { callerId: string | null }>;

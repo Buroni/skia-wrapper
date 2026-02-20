@@ -39,9 +39,11 @@
         import { useNodes } from "./src/nodes.ts";
         import { useEventListeners } from "./src/eventListeners.ts";
         import { useDragDrop } from "./src/dragDrop.ts";
+        import { useNodePaths } from "./src/nodePaths.ts";
 
         (async () => {
             const skiaContext = await useSkia("#canvas");
+            const { circle } = useNodePaths(skiaContext);
 
             usePanZoomWorld(skiaContext);
             // useStaticWorld(skiaContext);
@@ -60,12 +62,12 @@
                 }
             );
 
-            const { nodeContext, addCircle } = useNodes(skiaContext);
+            const nodeContext = useNodes(skiaContext);
             await nodeContext.addFont("Roboto", "https://cdn.skia.org/misc/Roboto-Regular.ttf");
 
             skiaContext.canvasEl.addEventListener("dblclick", () => {
                 nodeContext.createNode(
-                    addCircle(skiaContext.mouse.worldX, skiaContext.mouse.worldY, 50),
+                    circle(skiaContext.mouse.worldX, skiaContext.mouse.worldY, 50),
                     { labelOptions: { text: `${skiaContext.nodes.length}`, fontName: "Roboto", fontSize: 24 } }
                 );
             });

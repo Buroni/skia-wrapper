@@ -1,6 +1,6 @@
 import CanvasKitInit, { type Surface, type CanvasKit } from "canvaskit-wasm";
 import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
-import { type Addon, type Interactions, type SkiaContext } from "./types/SkiaContext";
+import { type Addon, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
 
 export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext> {
     const CanvasKit = await getCanvasKit();

@@ -1,8 +1,8 @@
 import { type CanvasNode } from "./types/CanvasNode";
-import { type SkiaContext } from "./types/SkiaContext";
+import type { EventListenersContext } from "./types/context/EventListenersContext";
+import { type SkiaContext } from "./types/context/SkiaContext";
 
-// TODO - type EventListenersContext
-export function useEventListeners(skiaContext: SkiaContext) {
+export function useEventListeners(skiaContext: SkiaContext): EventListenersContext {
     const { canvasEl } = skiaContext;
 
     const listeners = new Map<String, { event: string; listener: (e: Event) => void }>();
@@ -40,7 +40,7 @@ export function useEventListeners(skiaContext: SkiaContext) {
         return createListenerId(event, listener);
     }
 
-    function removeEventListener(listenerId: string) {
+    function removeEventListener(listenerId: string): void {
         const listenerEntry = listeners.get(listenerId);
 
         if (!listenerEntry) {

@@ -1,19 +1,24 @@
 import { type RequiredLabelOptions } from "./types/LabelOptions";
 import { type CanvasNode, type CanvasNodePathData } from "./types/CanvasNode";
 import { type CanvasNodeStyle, type RequiredCanvasNodeStyle } from "./types/CanvasNodeStyle";
-import { type Path, type Paragraph, type TextAlign } from "canvaskit-wasm"
+import { type Path, type Paragraph, type TextAlign, type FontMgr } from "canvaskit-wasm"
 import type { ParagraphBounds } from "./types/ParagraphBounds";
-import { type SkiaContext } from "./types/SkiaContext";
+import { type SkiaContext } from "./types/context/SkiaContext";
+import { type NodeContext } from "./types/context/NodeContext";
 
-// TODO - type NodeContext
-export function useNodes(skiaContext: SkiaContext) {
+export function useNodes(skiaContext: SkiaContext): NodeContext {
     const { surface, CanvasKit, addons } = skiaContext;
-    const fonts = {};
+    const fonts: Record<string, FontMgr> = {};
 
     async function addFont(name: string, url: string): Promise<void> {
         const response = await fetch(url);
         const arrBuffer = await response.arrayBuffer();
         const fontMgr = CanvasKit.FontMgr.FromData(arrBuffer);
+
+        if (!fontMgr) {
+            throw new Error(`Couldn't make font manager with name '${name}' and url '${url}'`)
+        }
+
         fonts[name] = fontMgr;
     }
 
@@ -137,24 +142,8 @@ export function useNodes(skiaContext: SkiaContext) {
         };
     }
 
-    function addCircle(cx: number, cy: number, r: number): CanvasNodePathData {
-        const path = new CanvasKit.Path();
-
-        return {
-            path: path.addCircle(0, 0, r),
-            cx,
-            cy,
-            r
-        };
-    }
-
-    const nodeContext = {
+    return {
         addFont,
         createNode
     };
-
-    return {
-        nodeContext,
-        addCircle
-    }
 }

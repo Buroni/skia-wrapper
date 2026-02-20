@@ -1,14 +1,14 @@
-import { type SkiaContext } from "./types/SkiaContext";
+import type { InteractionManagerContext } from "./types/context/InteractionManagerContext";
+import { type SkiaContext } from "./types/context/SkiaContext";
 
-// TODO - type InteractionManagetContext
-export function useInteractionManager(skiaContext: SkiaContext, key: string, callerId: string) {
+export function useInteractionManager(skiaContext: SkiaContext, key: string, callerId: string): InteractionManagerContext {
     if (!skiaContext.interactions[key]) {
         skiaContext.interactions[key] = {
             callerId: null
         };
     }
 
-    function setInteraction() {
+    function setInteraction(): void {
         if (skiaContext.interactions[key].callerId !== null) {
             throw new Error("Interaction already set");
         }
