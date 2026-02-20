@@ -1,4 +1,5 @@
 import { type CanvasNodeStrokeStyle } from "./types/CanvasNodeStyle";
+import type { NodePaintContext } from "./types/context/NodePaintContext";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type Paint } from "canvaskit-wasm";
 
@@ -11,7 +12,7 @@ const DEFAULT_FILL_STYLE = {
     fillColor: [1, 1, 1, 1]
 }
 
-export function useNodePaint(skiaContext: SkiaContext) {
+export function useNodePaint(skiaContext: SkiaContext): NodePaintContext {
     const { CanvasKit } = skiaContext;
 
     function setStroke({
