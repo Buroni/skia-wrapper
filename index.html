@@ -68,8 +68,7 @@
             skiaContext.canvasEl.addEventListener("dblclick", () => {
                 nodeContext.createNode(
                     circle(skiaContext.mouse.worldX, skiaContext.mouse.worldY, 50),
-                    undefined,
-                    { text: `${skiaContext.nodes.length}`, fontName: "Roboto", fontSize: 24 }
+                    { labelOptions: { text: `${skiaContext.nodes.length}`, fontName: "Roboto", fontSize: 24 } }
                 );
             });
         })();

@@ -31,14 +31,15 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         fonts[name] = fontMgr;
     }
 
-    function createNode(pathData: CanvasNodePathData, nodeStyle: CanvasNodeStyle, labelOptions: LabelOptions): CanvasNode {
+    function createNode(pathData: CanvasNodePathData, options: { nodeStyle?: CanvasNodeStyle, labelOptions?: LabelOptions } = {}): CanvasNode {
+        const nodeStyle = getDefaultNodeStyle(options.nodeStyle);
+        const labelOptions = getDefaultLabelOptions(options.labelOptions);
+
         const node: CanvasNode = {
             pathData,
             style: nodeStyle,
             labelOptions
         };
-
-        setDefaultNodeValues(node);
 
         let paragraphStyle: ParagraphStyle;
         if (node.labelOptions) {
@@ -88,28 +89,36 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         return node;
     }
 
-    function setDefaultNodeValues(node: CanvasNode): void {
-        if (!node.style) {
-            node.style = {};
+    function getDefaultNodeStyle(nodeStyle: CanvasNodeStyle | undefined): CanvasNodeStyle {
+        if (!nodeStyle) {
+            nodeStyle = {};
         }
 
-        if (!node.style.strokeStyle) {
-            node.style.strokeStyle = {};
+        if (!nodeStyle.strokeStyle) {
+            nodeStyle.strokeStyle = {};
         }
 
-        if (!node.style.fillStyle) {
-            node.style.fillStyle = {};
+        if (!nodeStyle.fillStyle) {
+            nodeStyle.fillStyle = {};
         }
 
-        if (node.labelOptions) {
-            if (!node.labelOptions.width) {
-                node.labelOptions.width = "fit";
-            }
+        return nodeStyle;
+    }
 
-            if (!node.labelOptions.fontSize) {
-                node.labelOptions.fontSize = 24;
-            }
+    function getDefaultLabelOptions(labelOptions: LabelOptions | undefined): LabelOptions | undefined {
+        if (!labelOptions) {
+            return undefined;
         }
+
+        if (!labelOptions.width) {
+            labelOptions.width = "fit";
+        }
+
+        if (!labelOptions.fontSize) {
+            labelOptions.fontSize = 24;
+        }
+
+        return labelOptions;
     }
 
     function addDisposable(fn: () => any, disposables: any[]) {
