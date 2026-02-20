@@ -1,13 +1,13 @@
-import { type RequiredLabelOptions, type LabelOptions } from "./LabelOptions";
-
-export type CanvasNodeStyle = {
+export type CanvasNodeStrokeStyle = {
     strokeColor?: number[];
     strokeWidth?: number;
-    labelOptions: LabelOptions;
-}
+};
 
-export type RequiredCanvasNodeStyle = {
-    strokeColor: number[];
-    strokeWidth: number;
-    labelOptions: RequiredLabelOptions;
-}
+export type CanvasNodeFillStyle = {
+    fillColor?: number[];
+};
+
+export type CanvasNodeStyle = {
+    strokeStyle?: CanvasNodeStrokeStyle;
+    fillStyle?: CanvasNodeFillStyle;
+};

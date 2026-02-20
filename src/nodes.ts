@@ -1,12 +1,21 @@
-import { type RequiredLabelOptions } from "./types/LabelOptions";
+import { type LabelOptions } from "./types/LabelOptions";
 import { type CanvasNode, type CanvasNodePathData } from "./types/CanvasNode";
-import { type CanvasNodeStyle, type RequiredCanvasNodeStyle } from "./types/CanvasNodeStyle";
-import { type Path, type Paragraph, type TextAlign, type FontMgr } from "canvaskit-wasm"
+import { type CanvasNodeStyle } from "./types/CanvasNodeStyle";
+import { type Path, type Paragraph, type TextAlign, type FontMgr, type ParagraphStyle, type Paint } from "canvaskit-wasm"
 import type { ParagraphBounds } from "./types/ParagraphBounds";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type NodeContext } from "./types/context/NodeContext";
+import { useNodePaint } from "./nodePaint";
+
+const DEFAULT_LABEL_OPTIONS = {
+    fontSize: 24,
+    width: "fit",
+    textAlign: "center"
+};
 
 export function useNodes(skiaContext: SkiaContext): NodeContext {
+    const nodePaintContext = useNodePaint(skiaContext);
+
     const { surface, CanvasKit, addons } = skiaContext;
     const fonts: Record<string, FontMgr> = {};
 
@@ -22,51 +31,50 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         fonts[name] = fontMgr;
     }
 
-    function createNode(pathData: CanvasNodePathData, nodeStyle: CanvasNodeStyle): CanvasNode {
-        const requiredNodeStyle: RequiredCanvasNodeStyle = {
-            strokeColor: [0, 0, 0, 1],
-            strokeWidth: 4,
-            ...nodeStyle,
-            labelOptions: {
-                width: "fit",
-                textAlign: "center",
-                ...nodeStyle.labelOptions
-            }
-        }
-
+    function createNode(pathData: CanvasNodePathData, nodeStyle: CanvasNodeStyle, labelOptions: LabelOptions): CanvasNode {
         const node: CanvasNode = {
             pathData,
-            style: requiredNodeStyle
-        }
+            style: nodeStyle,
+            labelOptions
+        };
 
-        const paragraphStyle = getParagraphStyle(node.style.labelOptions);
+        setDefaultNodeValues(node);
+
+        let paragraphStyle: ParagraphStyle;
+        if (node.labelOptions) {
+            paragraphStyle = getParagraphStyle(node.labelOptions);
+        }
 
         const drawFrame = () => {
             const disposables: any[] = [];
             const canvas = surface.getCanvas();
-            const strokePaint = addDisposable(() => new CanvasKit.Paint(), disposables);
-
-            // Paint
-            const { strokeColor, strokeWidth } = node.style;
-            strokePaint.setColor(CanvasKit.Color4f(strokeColor[0], strokeColor[1], strokeColor[2], strokeColor[3]));
-            strokePaint.setStyle(CanvasKit.PaintStyle.Stroke);
-            strokePaint.setStrokeWidth(strokeWidth);
-            strokePaint.setAntiAlias(true);
 
             canvas.save();
             canvas.translate(node.pathData.cx, node.pathData.cy);
-            canvas.drawPath(node.pathData.path, strokePaint);
 
-            const fontMgr = fonts[node.style.labelOptions.fontName];
+            if (node.style.strokeStyle) {
+                const { strokeStyle } = node.style;
+                const strokePaint = addDisposable(() => nodePaintContext.setStroke(strokeStyle), disposables);
+                canvas.drawPath(node.pathData.path, strokePaint);
+            }
 
-            const builder = addDisposable(() => CanvasKit.ParagraphBuilder.Make(paragraphStyle, fontMgr), disposables);
-            builder.addText(node.style.labelOptions.text);
+            if (node.style.fillStyle) {
+                const { fillStyle } = node.style;
+                const fillPaint = addDisposable(() => nodePaintContext.setFill(fillStyle), disposables);
+                canvas.drawPath(node.pathData.path, fillPaint);
+            }
 
-            const paragraph = addDisposable(() => builder.build(), disposables);
-            const paragraphWidth = node.style.labelOptions.width === "fit" ? getParagraphFitWidth(node.pathData.path) : node.style.labelOptions.width;
-            paragraph.layout(paragraphWidth);
-            const paragraphBounds = getParagraphBounds(paragraph, node.pathData.path);
-            canvas.drawParagraph(paragraph, paragraphBounds.x, paragraphBounds.y);
+            if (node.labelOptions) {
+                const fontMgr = fonts[node.labelOptions.fontName];
+                const builder = addDisposable(() => CanvasKit.ParagraphBuilder.Make(paragraphStyle, fontMgr), disposables);
+                builder.addText(node.labelOptions.text);
+
+                const paragraph = addDisposable(() => builder.build(), disposables);
+                const paragraphWidth = node.labelOptions.width === "fit" ? getParagraphFitWidth(node.pathData.path) : node.labelOptions.width;
+                paragraph.layout(paragraphWidth);
+                const paragraphBounds = getParagraphBounds(paragraph, node.pathData.path);
+                canvas.drawParagraph(paragraph, paragraphBounds.x, paragraphBounds.y);
+            }
 
             canvas.restore();
 
@@ -80,20 +88,44 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         return node;
     }
 
+    function setDefaultNodeValues(node: CanvasNode): void {
+        if (!node.style) {
+            node.style = {};
+        }
+
+        if (!node.style.strokeStyle) {
+            node.style.strokeStyle = {};
+        }
+
+        if (!node.style.fillStyle) {
+            node.style.fillStyle = {};
+        }
+
+        if (node.labelOptions) {
+            if (!node.labelOptions.width) {
+                node.labelOptions.width = "fit";
+            }
+
+            if (!node.labelOptions.fontSize) {
+                node.labelOptions.fontSize = 24;
+            }
+        }
+    }
+
     function addDisposable(fn: () => any, disposables: any[]) {
         const disposable = fn();
         disposables.push(disposable);
         return disposable;
     }
 
-    function getParagraphStyle(labelOptions: RequiredLabelOptions) {
+    function getParagraphStyle(labelOptions: LabelOptions) {
         return new CanvasKit.ParagraphStyle({
             textStyle: {
                 color: CanvasKit.BLACK,
                 fontFamilies: [labelOptions.fontName],
-                fontSize: labelOptions.fontSize,
+                fontSize: typeof labelOptions.fontSize === 'undefined' ? DEFAULT_LABEL_OPTIONS.fontSize : labelOptions.fontSize,
             },
-            textAlign: toSkiaTextAlign(labelOptions.textAlign),
+            textAlign: toSkiaTextAlign(typeof labelOptions.textAlign === 'undefined' ? DEFAULT_LABEL_OPTIONS.textAlign : labelOptions.textAlign),
         });
     }
 

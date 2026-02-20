@@ -1,5 +1,6 @@
 import { type Path } from "canvaskit-wasm";
-import { type RequiredCanvasNodeStyle } from "./CanvasNodeStyle";
+import { type CanvasNodeStyle } from "./CanvasNodeStyle";
+import type { LabelOptions } from "./LabelOptions";
 
 export type CanvasNodePathData = {
     path: Path;
@@ -10,5 +11,6 @@ export type CanvasNodePathData = {
 
 export type CanvasNode = {
     pathData: CanvasNodePathData;
-    style: RequiredCanvasNodeStyle;
+    style: CanvasNodeStyle;
+    labelOptions?: LabelOptions;
 }
