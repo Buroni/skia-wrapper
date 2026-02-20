@@ -1,6 +1,7 @@
 import CanvasKitInit, { type Surface, type CanvasKit } from "canvaskit-wasm";
 import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
-import { type Addon, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
+import { type Addon, type DisplayOrderAddon, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
+import type { CanvasNode } from "./types/CanvasNode";
 
 export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext> {
     const CanvasKit = await getCanvasKit();
@@ -8,7 +9,9 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
     const surface = await getSurface();
 
     const addons: Addon[] = [];
+    const displayOrderAddons: DisplayOrderAddon[] = [];
     const interactions: Interactions = {};
+    const nodes: CanvasNode[] = [];
 
     drawFrame();
 
@@ -50,6 +53,10 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
             addon();
         });
 
+        displayOrderAddons.forEach(({ addon }) => {
+            addon();
+        });
+
         // Clean up
         canvas.restore();
         paint.delete();
@@ -58,17 +65,27 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         surface.requestAnimationFrame(drawFrame);
     }
 
+    function syncAddons(): void {
+        const indexMap = new Map(nodes.map((item, i) => [item, i]));
+
+        displayOrderAddons.sort((aObj1, aObj2) => {
+            return (indexMap.get(aObj1.entity) ?? Infinity) - (indexMap.get(aObj2.entity) ?? Infinity);
+        });
+    }
+
     return {
         canvasEl,
         CanvasKit,
         surface,
         addons,
+        displayOrderAddons,
         interactions,
         mouse: {
             worldX: 0,
             worldY: 0
         },
-        nodes: [],
-        fonts: {}
+        nodes,
+        fonts: {},
+        syncAddons
     }
 }

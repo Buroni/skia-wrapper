@@ -1,67 +1,59 @@
 import { type CanvasNode } from "./types/CanvasNode";
-import type { EventListenersContext } from "./types/context/EventListenersContext";
+import type { EventListenersContext, InnerListener, OuterListener } from "./types/context/EventListenersContext";
 import { type SkiaContext } from "./types/context/SkiaContext";
+import { TwoKeyMap } from "./utils/TwoKeyMap";
 
 export function useEventListeners(skiaContext: SkiaContext): EventListenersContext {
     const { canvasEl } = skiaContext;
 
-    const listeners = new Map<String, { event: string; listener: (e: Event) => void }>();
+    const listenerMap = new TwoKeyMap<string, InnerListener, OuterListener>();
 
-    function addEventListener(
+    function addHitItemListener(
         event: string,
         items: CanvasNode | CanvasNode[],
-        fn: (e: Event, item: CanvasNode, pointerIsInsideItem: boolean) => void,
-        unionFn?: (e: Event, pointerIsInsideItems: boolean) => void
-    ): string {
+        fn: InnerListener
+    ): void {
         if (!Array.isArray(items)) {
             items = [items];
         }
 
-        const listener = (e: Event) => {
-            const collisionFlags: boolean[] = [];
+        const outerListener = (e: Event) => {
+            const hitItems: CanvasNode[] = [];
 
             for (const item of items) {
                 const pointerIsInsideItem = item.pathData.path.contains(
                     skiaContext.mouse.worldX - item.pathData.cx,
                     skiaContext.mouse.worldY - item.pathData.cy
                 );
-                collisionFlags.push(pointerIsInsideItem);
 
-                fn(e, item, pointerIsInsideItem);
+                if (pointerIsInsideItem) {
+                    hitItems.push(item);
+                }
             }
 
-            if (unionFn) {
-                const pointerIsInsideItems = collisionFlags.some(Boolean);
-                unionFn(e, pointerIsInsideItems);
-            }
-        }
-        canvasEl.addEventListener(event, listener);
+            const frontItem = hitItems.length ? hitItems[hitItems.length - 1] : null;
 
-        return createListenerId(event, listener);
-    }
-
-    function removeEventListener(listenerId: string): void {
-        const listenerEntry = listeners.get(listenerId);
-
-        if (!listenerEntry) {
-            throw new Error(`No listener with key '${listenerId}'`);
+            fn(e, frontItem, hitItems);
         }
 
-        const { event, listener } = listenerEntry;
+        canvasEl.addEventListener(event, outerListener);
 
-        canvasEl.removeEventListener(event, listener);
-        listeners.delete(listenerId);
+        listenerMap.set(event, fn, outerListener);
     }
 
-    function createListenerId(event: string, listener: (e: Event) => void): string {
-        const listenerId = crypto.randomUUID();
-        listeners.set(listenerId, { event, listener });
+    function removeEventListener(event: string, listener: InnerListener): void {
+        const outerListener = listenerMap.get(event, listener);
 
-        return listenerId;
+        if (!outerListener) {
+            return;
+        }
+
+        canvasEl.removeEventListener(event, outerListener);
+        listenerMap.delete(event, listener);
     }
 
     return {
-        addEventListener,
+        addHitItemListener,
         removeEventListener
     }
 }

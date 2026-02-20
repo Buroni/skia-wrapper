@@ -1,11 +1,13 @@
 import type { CanvasNode } from "../CanvasNode";
 
+export type InnerListener = (e: Event, frontItem: CanvasNode | null, hitItems: CanvasNode[]) => void;
+export type OuterListener = (e: Event) => void;
+
 export type EventListenersContext = {
-    addEventListener: (
+    addHitItemListener: (
         event: string,
         items: CanvasNode | CanvasNode[],
-        fn: (e: Event, item: CanvasNode, pointerIsInsideItem: boolean) => void,
-        unionFn?: (e: Event, pointerIsInsideItems: boolean) => void
-    ) => string;
-    removeEventListener: (listenerId: string) => void;
+        fn: InnerListener
+    ) => void;
+    removeEventListener: (event: string, listener: InnerListener) => void;
 };

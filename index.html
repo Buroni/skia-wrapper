@@ -44,29 +44,47 @@
 
         (async () => {
             const skiaContext = await useSkia("#canvas");
+            const nodeContext = useNodes(skiaContext);
+            const listenerContext = useEventListeners(skiaContext);
 
             const fontsContext = await useFonts(skiaContext);
             await fontsContext.addFont("Roboto", "https://cdn.skia.org/misc/Roboto-Regular.ttf");
-            
-            const { circle } = useNodePaths(skiaContext);
 
             usePanZoomWorld(skiaContext);
             useDragDrop(skiaContext);
-
-            const listenerContext = useEventListeners(skiaContext);
-            const listenerId = listenerContext.addEventListener(
-                "mousemove",
+            
+            const { circle } = useNodePaths(skiaContext);
+        
+            listenerContext.addHitItemListener(
+                "mousemove", 
                 skiaContext.nodes,
-                (e, node, isInside) => {
-                    node.style.stroke.width = isInside ? 6 : 4;
-                    node.style.stroke.color = isInside ? [255, 0, 0, 0.5] : [0, 0, 0, 1];
-                },
-                (e, isInside) => {
-                    skiaContext.canvasEl.style.cursor = isInside ? "pointer" : "default";
+                (e, frontNode, hitNodes) => {
+                    skiaContext.canvasEl.style.cursor = hitNodes.length ? "pointer" : "default";
+
+                    if (frontNode) {
+                        frontNode.style.stroke.width = 6;
+                        frontNode.style.stroke.color = [255, 0, 0, 0.5];
+                    }
+
+                    for (const node of skiaContext.nodes) {
+                        if (node === frontNode) {
+                            continue;
+                        }
+                        node.style.stroke.width = 4;
+                        node.style.stroke.color = [0, 0, 0, 1];
+                    }
                 }
             );
-
-            const nodeContext = useNodes(skiaContext);
+            
+            listenerContext.addHitItemListener(
+                "mousedown",
+                skiaContext.nodes,
+                (e, frontNode) => {
+                    if (frontNode) {
+                        nodeContext.toFront(frontNode);
+                    }
+                }
+            );
 
             skiaContext.canvasEl.addEventListener("dblclick", () => {
                 nodeContext.createNode(

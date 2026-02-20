@@ -1,7 +1,7 @@
 import type { Paragraph, ParagraphStyle, Path, TextAlign } from "canvaskit-wasm";
 import type { CanvasNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
-import { addDisposable } from "./utils";
+import { addDisposable } from "./utils/utils";
 import type { LabelOptions } from "./types/LabelOptions";
 import type { ParagraphBounds } from "./types/ParagraphBounds";
 

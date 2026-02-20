@@ -3,7 +3,7 @@ export type LabelWidth = number | 'fit';
 export type LabelOptions = {
     text: string;
     fontName: string;
-    fontSize: number;
+    fontSize?: number;
     width?: LabelWidth;
     textAlign?: 'center' | 'left' | 'right';
 };
