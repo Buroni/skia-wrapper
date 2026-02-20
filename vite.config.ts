@@ -4,10 +4,7 @@ import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig({
     server: {
-        port: 5173,
-        headers: {
-            'Content-Type': 'application/wasm',
-        }
+        port: 5173
     },
     plugins: [
         viteCompression(),
