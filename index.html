@@ -49,14 +49,13 @@
             const nodeContext = useNodes(skiaContext);
             const edgeContext = useEdges(skiaContext);
             const listenerContext = useEventListeners(skiaContext);
-            const { toFront, toBack } = useDisplayOrder(skiaContext);
+            const { toBack } = useDisplayOrder(skiaContext);
 
             const fontsContext = await useFonts(skiaContext);
             await fontsContext.addFont("Roboto", "https://cdn.skia.org/misc/Roboto-Regular.ttf");
 
             usePanZoomWorld(skiaContext);
-            useDragDrop(skiaContext);
-            
+            const { isLastPointerMoveDrag } = useDragDrop(skiaContext);
             const { circle } = useNodePaths(skiaContext);
         
             listenerContext.addHitItemListener(
@@ -82,7 +81,7 @@
             const pendingEdge = { sourceNode: null, targetNode: null };
             
             listenerContext.addHitItemListener(
-                "mouseup",
+                "pointerup",
                 skiaContext.nodes,
                 (e, frontNode) => {
                     if (!frontNode) {
@@ -97,11 +96,11 @@
                         return;
                     }
 
-                    if (!pendingEdge.sourceNode) {
+                    if (!pendingEdge.sourceNode && !isLastPointerMoveDrag()) {
                         frontNode.style.stroke.color = [1, 0, 0, 1] 
                         pendingEdge.sourceNode = frontNode;
                         // edgeContext.createPreviewEdge(pendingEdge.sourceNode);
-                    } else if (!pendingEdge.targetNode) {
+                    } else if (!pendingEdge.targetNode && !isLastPointerMoveDrag()) {
                         frontNode.style.stroke.color = [1, 0, 0, 1] 
                         pendingEdge.targetNode = frontNode;
                     }
