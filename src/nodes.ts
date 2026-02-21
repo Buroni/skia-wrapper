@@ -21,9 +21,11 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         const labelOptions = getDefaultLabelOptions(options.labelOptions);
 
         const node: CanvasNode = {
+            type: "node",
             pathData,
             style: nodeStyle,
-            labelOptions
+            labelOptions,
+            displayOrder: skiaContext.numberEntities
         };
 
         let paragraphStyle: ParagraphStyle | undefined;
@@ -38,44 +40,6 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         skiaContext.nodes.push(node);
 
         return node;
-    }
-
-    function toBack(node: CanvasNode): void {
-        const { nodes } = skiaContext;
-
-        const index = nodes.findIndex(n => n === node);
-
-        if (index === -1) {
-            throw new Error("Couldn't find node in toBack");
-        }
-
-        if (index === 0) {
-            return;
-        }
-
-        const [item] = nodes.splice(index, 1);
-        nodes.unshift(item);
-
-        skiaContext.syncAddons();
-    }
-
-    function toFront(node: CanvasNode): void {
-        const { nodes } = skiaContext;
-
-        const index = nodes.findIndex(n => n === node);
-
-        if (index === -1) {
-            throw new Error("Couldn't find node in toBack");
-        }
-
-        if (index === nodes.length - 1) {
-            return;
-        }
-
-        const [item] = nodes.splice(index, 1);
-        nodes.push(item);
-
-        skiaContext.syncAddons();
     }
 
     function makeDrawFrame(node: CanvasNode, paragraphStyle?: ParagraphStyle): () => void {
@@ -140,8 +104,6 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
     }
 
     return {
-        createNode,
-        toBack,
-        toFront
+        createNode
     };
 }

@@ -2,6 +2,7 @@ import CanvasKitInit, { type Surface, type CanvasKit } from "canvaskit-wasm";
 import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
 import { type Addon, type DisplayOrderAddon, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
 import type { CanvasNode } from "./types/CanvasNode";
+import type { CanvasEntity } from "./types/CanvasEntity";
 
 export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext> {
     const CanvasKit = await getCanvasKit();
@@ -66,13 +67,16 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         surface.requestAnimationFrame(drawFrame);
     }
 
-    function syncAddons(affectedItem: any = null): void {
-        if (affectedItem && !displayOrderAddons.some(a => a.entity === affectedItem)) {
-            const index = displayOrderAddons.findIndex(n => n === affectedItem.entity);
-            displayOrderAddons.splice(index, 1);
-        }
+    function syncAddons(): void {
+        const entities: CanvasEntity[] = [...nodes, ...edges];
+        entities.sort((e1, e2) => e1.displayOrder - e2.displayOrder);
 
-        const indexMap = new Map(nodes.map((item, i) => [item, i]));
+        // if (affectedItem && !displayOrderAddons.some(a => a.entity === affectedItem)) {
+        //     const index = displayOrderAddons.findIndex(n => n === affectedItem.entity);
+        //     displayOrderAddons.splice(index, 1);
+        // }
+
+        const indexMap = new Map(entities.map((item, i) => [item, i]));
 
         displayOrderAddons.sort((aObj1, aObj2) => {
             return (indexMap.get(aObj1.entity) ?? Infinity) - (indexMap.get(aObj2.entity) ?? Infinity);
@@ -92,6 +96,15 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         },
         nodes,
         edges,
+        get entities(): CanvasEntity[] {
+            const entities: CanvasEntity[] = [...nodes, ...edges];
+            entities.sort((e1, e2) => e1.displayOrder - e2.displayOrder);
+
+            return entities;
+        },
+        get numberEntities(): number {
+            return nodes.length + edges.length;
+        },
         fonts: {},
         syncAddons
     }

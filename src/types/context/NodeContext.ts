@@ -4,6 +4,4 @@ import type { LabelOptions } from "../LabelOptions";
 
 export type NodeContext = {
     createNode: (pathData: CanvasNodePathData, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions }) => CanvasNode;
-    toBack: (node: CanvasNode) => void;
-    toFront: (node: CanvasNode) => void;
 };

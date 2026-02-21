@@ -9,9 +9,11 @@ export function useEdges(skiaContext: SkiaContext) {
     const canvas = surface.getCanvas();
 
     function createEdge(sourceNode: CanvasNode, targetNode: CanvasNode): CanvasEdge {
-        const edge: any = {
+        const edge: CanvasEdge = {
+            type: "edge",
             sourceNode,
             targetNode,
+            displayOrder: skiaContext.numberEntities
         };
 
         const drawFrame = () => {

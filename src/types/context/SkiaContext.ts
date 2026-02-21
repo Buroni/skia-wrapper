@@ -1,11 +1,12 @@
 import { type Surface, type CanvasKit, type FontMgr } from "canvaskit-wasm";
 import { type CanvasNode } from "../CanvasNode";
 import type { CanvasEdge } from "../CanvasEdge";
+import type { CanvasEntity } from "../CanvasEntity";
 
 export type Addon = () => void;
 
 export type DisplayOrderAddon = {
-    entity: CanvasNode;
+    entity: CanvasEntity;
     addon: Addon;
 };
 
@@ -24,6 +25,8 @@ export type SkiaContext = {
     };
     nodes: CanvasNode[];
     edges: CanvasEdge[];
+    entities: CanvasEntity[];
+    numberEntities: number;
     fonts: Record<string, FontMgr>;
     syncAddons: () => void;
 }

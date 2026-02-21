@@ -42,12 +42,14 @@
         import { useDragDrop } from "./src/dragDrop.ts";
         import { useNodePaths } from "./src/nodePaths.ts";
         import { useFonts } from "./src/fonts.ts";
+        import { useDisplayOrder } from "./src/displayOrder";
 
         (async () => {
             const skiaContext = await useSkia("#canvas");
             const nodeContext = useNodes(skiaContext);
             const edgeContext = useEdges(skiaContext);
             const listenerContext = useEventListeners(skiaContext);
+            const { toFront, toBack } = useDisplayOrder(skiaContext);
 
             const fontsContext = await useFonts(skiaContext);
             await fontsContext.addFont("Roboto", "https://cdn.skia.org/misc/Roboto-Regular.ttf");
@@ -105,9 +107,11 @@
                     }
 
                     if (pendingEdge.sourceNode && pendingEdge.targetNode) {
-                        edgeContext.createEdge(pendingEdge.sourceNode, pendingEdge.targetNode);
-                        pendingEdge.sourceNode.style.stroke.color = [0, 0, 0, 1];
-                        pendingEdge.targetNode.style.stroke.color = [0, 0, 0, 1];
+                        const edge = edgeContext.createEdge(pendingEdge.sourceNode, pendingEdge.targetNode);
+                        edge.sourceNode.style.stroke.color = [0, 0, 0, 1];
+                        edge.targetNode.style.stroke.color = [0, 0, 0, 1];
+                        toBack(edge);
+                        
                         pendingEdge.sourceNode = null;
                         pendingEdge.targetNode = null;
                     } 
