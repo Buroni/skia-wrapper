@@ -37,6 +37,7 @@
         import { usePanZoomWorld } from "./src/world/panZoomWorld.ts";
         import { useStaticWorld } from "./src/world/staticWorld.ts";
         import { useNodes } from "./src/nodes.ts";
+        import { useEdges } from "./src/edges.ts";
         import { useEventListeners } from "./src/eventListeners.ts";
         import { useDragDrop } from "./src/dragDrop.ts";
         import { useNodePaths } from "./src/nodePaths.ts";
@@ -45,6 +46,7 @@
         (async () => {
             const skiaContext = await useSkia("#canvas");
             const nodeContext = useNodes(skiaContext);
+            const edgeContext = useEdges(skiaContext);
             const listenerContext = useEventListeners(skiaContext);
 
             const fontsContext = await useFonts(skiaContext);
@@ -63,7 +65,6 @@
 
                     if (frontNode) {
                         frontNode.style.stroke.width = 6;
-                        frontNode.style.stroke.color = [255, 0, 0, 0.5];
                     }
 
                     for (const node of skiaContext.nodes) {
@@ -71,18 +72,45 @@
                             continue;
                         }
                         node.style.stroke.width = 4;
-                        node.style.stroke.color = [0, 0, 0, 1];
                     }
                 }
             );
             
+            
+            const pendingEdge = { sourceNode: null, targetNode: null };
+            
             listenerContext.addHitItemListener(
-                "mousedown",
+                "mouseup",
                 skiaContext.nodes,
                 (e, frontNode) => {
-                    if (frontNode) {
-                        nodeContext.toFront(frontNode);
+                    if (!frontNode) {
+                        if (pendingEdge.sourceNode) {
+                            pendingEdge.sourceNode.style.stroke.color = [0, 0, 0, 1];
+                            pendingEdge.sourceNode = null;
+                        }
+                        if (pendingEdge.targetNode) {
+                            pendingEdge.targetNode.style.stroke.color = [0, 0, 0, 1];
+                            pendingEdge.targetNode = null;
+                        }
+                        return;
                     }
+
+                    if (!pendingEdge.sourceNode) {
+                        frontNode.style.stroke.color = [1, 0, 0, 1] 
+                        pendingEdge.sourceNode = frontNode;
+                        // edgeContext.createPreviewEdge(pendingEdge.sourceNode);
+                    } else if (!pendingEdge.targetNode) {
+                        frontNode.style.stroke.color = [1, 0, 0, 1] 
+                        pendingEdge.targetNode = frontNode;
+                    }
+
+                    if (pendingEdge.sourceNode && pendingEdge.targetNode) {
+                        edgeContext.createEdge(pendingEdge.sourceNode, pendingEdge.targetNode);
+                        pendingEdge.sourceNode.style.stroke.color = [0, 0, 0, 1];
+                        pendingEdge.targetNode.style.stroke.color = [0, 0, 0, 1];
+                        pendingEdge.sourceNode = null;
+                        pendingEdge.targetNode = null;
+                    } 
                 }
             );
 

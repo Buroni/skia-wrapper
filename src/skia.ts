@@ -12,6 +12,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
     const displayOrderAddons: DisplayOrderAddon[] = [];
     const interactions: Interactions = {};
     const nodes: CanvasNode[] = [];
+    const edges: any[] = [];
 
     drawFrame();
 
@@ -65,7 +66,12 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         surface.requestAnimationFrame(drawFrame);
     }
 
-    function syncAddons(): void {
+    function syncAddons(affectedItem: any = null): void {
+        if (affectedItem && !displayOrderAddons.some(a => a.entity === affectedItem)) {
+            const index = displayOrderAddons.findIndex(n => n === affectedItem.entity);
+            displayOrderAddons.splice(index, 1);
+        }
+
         const indexMap = new Map(nodes.map((item, i) => [item, i]));
 
         displayOrderAddons.sort((aObj1, aObj2) => {
@@ -85,6 +91,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
             worldY: 0
         },
         nodes,
+        edges,
         fonts: {},
         syncAddons
     }

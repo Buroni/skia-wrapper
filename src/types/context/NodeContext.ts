@@ -1,9 +1,9 @@
 import type { CanvasNode, CanvasNodePathData } from "../CanvasNode";
-import type { CanvasNodeStyle } from "../CanvasNodeStyle";
+import type { EntityStyle } from "../EntityStyle";
 import type { LabelOptions } from "../LabelOptions";
 
 export type NodeContext = {
-    createNode: (pathData: CanvasNodePathData, options: { nodeStyle?: CanvasNodeStyle, labelOptions?: LabelOptions }) => CanvasNode;
+    createNode: (pathData: CanvasNodePathData, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions }) => CanvasNode;
     toBack: (node: CanvasNode) => void;
     toFront: (node: CanvasNode) => void;
 };

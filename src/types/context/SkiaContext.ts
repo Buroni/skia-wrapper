@@ -1,5 +1,6 @@
 import { type Surface, type CanvasKit, type FontMgr } from "canvaskit-wasm";
 import { type CanvasNode } from "../CanvasNode";
+import type { CanvasEdge } from "../CanvasEdge";
 
 export type Addon = () => void;
 
@@ -22,6 +23,7 @@ export type SkiaContext = {
         worldY: number
     };
     nodes: CanvasNode[];
+    edges: CanvasEdge[];
     fonts: Record<string, FontMgr>;
     syncAddons: () => void;
 }

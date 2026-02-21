@@ -1,4 +1,4 @@
-import { type CanvasNodeStrokeStyle } from "./types/CanvasNodeStyle";
+import { type EntityStrokeStyle } from "./types/EntityStyle";
 import type { NodePaintContext } from "./types/context/NodePaintContext";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type Paint } from "canvaskit-wasm";
@@ -17,7 +17,7 @@ export function useNodePaint(skiaContext: SkiaContext): NodePaintContext {
 
     function setStroke({
         color = DEFAULT_STROKE_STYLE.color,
-        width = DEFAULT_STROKE_STYLE.width }: CanvasNodeStrokeStyle
+        width = DEFAULT_STROKE_STYLE.width }: EntityStrokeStyle
     ): Paint {
         const strokePaint = new CanvasKit.Paint();
         strokePaint.setStyle(CanvasKit.PaintStyle.Stroke);

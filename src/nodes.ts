@@ -1,6 +1,6 @@
 import { type LabelOptions } from "./types/LabelOptions";
 import { type CanvasNode, type CanvasNodePathData } from "./types/CanvasNode";
-import { type CanvasNodeStyle } from "./types/CanvasNodeStyle";
+import { type EntityStyle } from "./types/EntityStyle";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type NodeContext } from "./types/context/NodeContext";
 import { useNodePaint } from "./nodePaint";
@@ -16,7 +16,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
 
     const canvas = surface.getCanvas();
 
-    function createNode(pathData: CanvasNodePathData, options: { nodeStyle?: CanvasNodeStyle, labelOptions?: LabelOptions } = {}): CanvasNode {
+    function createNode(pathData: CanvasNodePathData, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions } = {}): CanvasNode {
         const nodeStyle = getDefaultNodeStyle(options.nodeStyle);
         const labelOptions = getDefaultLabelOptions(options.labelOptions);
 
@@ -107,7 +107,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         }
     }
 
-    function getDefaultNodeStyle(nodeStyle: CanvasNodeStyle | undefined): CanvasNodeStyle {
+    function getDefaultNodeStyle(nodeStyle: EntityStyle | undefined): EntityStyle {
         if (!nodeStyle) {
             nodeStyle = {};
         }
