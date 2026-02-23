@@ -1,9 +1,9 @@
 import type { CanvasEntity } from "./CanvasEntity";
-import type { CanvasNode } from "./CanvasNode";
+import type { CanvasNode, CanvasPathNode } from "./CanvasNode";
 
 export interface CanvasEdge extends CanvasEntity {
     type: "edge";
-    sourceNode: CanvasNode;
+    sourceNode: CanvasPathNode;
     targetNode: CanvasNode;
 };
 

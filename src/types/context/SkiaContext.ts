@@ -8,6 +8,7 @@ export type Addon = () => void;
 export type DisplayOrderAddon = {
     entity: CanvasEntity;
     addon: Addon;
+    isPreview?: boolean;
 };
 
 export type Interactions = Record<string, { callerId: string | null }>;
@@ -29,4 +30,5 @@ export type SkiaContext = {
     numberEntities: number;
     fonts: Record<string, FontMgr>;
     syncAddons: () => void;
+    clearPreviews: () => void;
 }

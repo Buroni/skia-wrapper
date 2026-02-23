@@ -1,14 +1,14 @@
 import type { Paint } from "canvaskit-wasm";
-import type { CanvasNode } from "./types/CanvasNode";
+import { isCanvasPathNode, type CanvasNode, type CanvasPathNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
 import type { CanvasEdge } from "./types/CanvasEdge";
 
 export function useEdges(skiaContext: SkiaContext) {
-    const { surface, CanvasKit, displayOrderAddons, addons } = skiaContext;
+    const { surface, CanvasKit, displayOrderAddons } = skiaContext;
 
     const canvas = surface.getCanvas();
 
-    function createEdge(sourceNode: CanvasNode, targetNode: CanvasNode): CanvasEdge {
+    function createEdge(sourceNode: CanvasPathNode, targetNode: CanvasNode): CanvasEdge {
         const edge: CanvasEdge = {
             type: "edge",
             sourceNode,
@@ -40,14 +40,28 @@ export function useEdges(skiaContext: SkiaContext) {
 
         const path = new CanvasKit.Path();
         path.moveTo(0, 0);
-        path.lineTo(targetNode.pathData.cx - sourceNode.pathData.cx, targetNode.pathData.cy - sourceNode.pathData.cy);
+
+        if (isCanvasPathNode(targetNode)) {
+            path.lineTo(targetNode.pathData.cx - sourceNode.pathData.cx, targetNode.pathData.cy - sourceNode.pathData.cy);
+        } else {
+            const { mouse } = skiaContext;
+            path.lineTo(mouse.worldX - sourceNode.pathData.cx, mouse.worldY - sourceNode.pathData.cy);
+        }
+
         canvas.drawPath(path, paint);
 
         canvas.restore();
         path.delete();
     }
 
-    function createPreviewEdge(sourceNode: CanvasNode) {
+    function createPreviewEdge(sourceNode: CanvasPathNode): CanvasEdge {
+        const edge: CanvasEdge = {
+            type: "edge",
+            sourceNode,
+            targetNode: { type: "node", displayOrder: 0 },
+            displayOrder: skiaContext.numberEntities
+        }
+
         const drawFrame = () => {
             const paint = new CanvasKit.Paint();
             paint.setStyle(CanvasKit.PaintStyle.Stroke);
@@ -55,10 +69,13 @@ export function useEdges(skiaContext: SkiaContext) {
             paint.setStrokeWidth(2);
             paint.setAntiAlias(true);
 
-            canvas.drawLine(sourceNode.pathData.cx, sourceNode.pathData.cy, skiaContext.mouse.worldX, skiaContext.mouse.worldY, paint);
+            drawEdgePath(edge, paint);
         };
 
-        addons.push(drawFrame);
+        displayOrderAddons.push({ entity: edge, addon: drawFrame, isPreview: true });
+        skiaContext.edges.push(edge);
+
+        return edge;
     }
 
     return {

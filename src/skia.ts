@@ -11,6 +11,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
 
     const addons: Addon[] = [];
     const displayOrderAddons: DisplayOrderAddon[] = [];
+
     const interactions: Interactions = {};
     const nodes: CanvasNode[] = [];
     const edges: any[] = [];
@@ -83,6 +84,19 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         });
     }
 
+    function clearPreviews(): void {
+        const toBeRemoved: number[] = displayOrderAddons
+            .map((a, idx) => ({ isPreview: a.isPreview, idx }))
+            .filter(a => a.isPreview)
+            .map(a => a.idx);
+
+        toBeRemoved.sort((a, b) => b - a);
+
+        for (const idx of toBeRemoved) {
+            displayOrderAddons.splice(idx, 1);
+        }
+    }
+
     return {
         canvasEl,
         CanvasKit,
@@ -106,6 +120,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
             return nodes.length + edges.length;
         },
         fonts: {},
-        syncAddons
+        syncAddons,
+        clearPreviews
     }
 }

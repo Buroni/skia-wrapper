@@ -73,7 +73,6 @@ export function useDragDrop(skiaContext: SkiaContext): any {
         });
 
         canvasEl.addEventListener('pointermove', (e: MouseEvent) => {
-            console.log(_isLastPointerMoveDrag);
             if (dragging) {
                 _isLastPointerMoveDrag = true;
 

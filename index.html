@@ -85,6 +85,7 @@
                 skiaContext.nodes,
                 (e, frontNode) => {
                     if (!frontNode) {
+                        skiaContext.clearPreviews();
                         if (pendingEdge.sourceNode) {
                             pendingEdge.sourceNode.style.stroke.color = [0, 0, 0, 1];
                             pendingEdge.sourceNode = null;
@@ -99,13 +100,16 @@
                     if (!pendingEdge.sourceNode && !isLastPointerMoveDrag()) {
                         frontNode.style.stroke.color = [1, 0, 0, 1] 
                         pendingEdge.sourceNode = frontNode;
-                        // edgeContext.createPreviewEdge(pendingEdge.sourceNode);
+                        const previewEdge = edgeContext.createPreviewEdge(pendingEdge.sourceNode);
+                        toBack(previewEdge);
                     } else if (!pendingEdge.targetNode && !isLastPointerMoveDrag()) {
                         frontNode.style.stroke.color = [1, 0, 0, 1] 
                         pendingEdge.targetNode = frontNode;
                     }
 
                     if (pendingEdge.sourceNode && pendingEdge.targetNode) {
+                        skiaContext.clearPreviews();
+
                         const edge = edgeContext.createEdge(pendingEdge.sourceNode, pendingEdge.targetNode);
                         edge.sourceNode.style.stroke.color = [0, 0, 0, 1];
                         edge.targetNode.style.stroke.color = [0, 0, 0, 1];

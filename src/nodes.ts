@@ -1,5 +1,5 @@
 import { type LabelOptions } from "./types/LabelOptions";
-import { type CanvasNode, type CanvasNodePathData } from "./types/CanvasNode";
+import { type CanvasNode, type CanvasNodePathData, type CanvasPathNode } from "./types/CanvasNode";
 import { type EntityStyle } from "./types/EntityStyle";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type NodeContext } from "./types/context/NodeContext";
@@ -20,7 +20,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         const nodeStyle = getDefaultNodeStyle(options.nodeStyle);
         const labelOptions = getDefaultLabelOptions(options.labelOptions);
 
-        const node: CanvasNode = {
+        const node: CanvasPathNode = {
             type: "node",
             pathData,
             style: nodeStyle,
@@ -42,7 +42,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         return node;
     }
 
-    function makeDrawFrame(node: CanvasNode, paragraphStyle?: ParagraphStyle): () => void {
+    function makeDrawFrame(node: CanvasPathNode, paragraphStyle?: ParagraphStyle): () => void {
         return () => {
             const disposables: any[] = [];
 
