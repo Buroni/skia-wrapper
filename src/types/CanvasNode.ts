@@ -1,7 +1,7 @@
 import { type Path } from "canvaskit-wasm";
 import { type EntityStyle } from "./EntityStyle";
 import type { LabelOptions } from "./LabelOptions";
-import type { CanvasEntity } from "./CanvasEntity";
+import type { CanvasEntity, Stylable } from "./CanvasEntity";
 
 export type CanvasNodePathData = {
     path: Path;
@@ -14,7 +14,7 @@ export interface CanvasNode extends CanvasEntity {
     type: "node";
 }
 
-export interface CanvasPathNode extends CanvasEntity {
+export interface CanvasPathNode extends CanvasEntity, Stylable {
     type: "node";
     pathData: CanvasNodePathData;
     style: EntityStyle;

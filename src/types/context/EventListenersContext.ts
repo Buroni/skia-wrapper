@@ -1,13 +1,13 @@
-import type { CanvasNode } from "../CanvasNode";
+import type { CanvasPathNode } from "../CanvasNode";
 
-export type InnerListener = (e: Event, frontItem: CanvasNode | null, hitItems: CanvasNode[]) => void;
+export type InnerListener = (e: Event, frontItem: CanvasPathNode | null, hitItems: CanvasPathNode[]) => void;
 export type OuterListener = (e: Event) => void;
 
 export type EventListenersContext = {
     addHitItemListener: (
         event: string,
-        items: CanvasNode | CanvasNode[],
+        items: CanvasPathNode | CanvasPathNode[],
         fn: InnerListener
-    ) => void;
+    ) => void,
     removeEventListener: (event: string, listener: InnerListener) => void;
 };

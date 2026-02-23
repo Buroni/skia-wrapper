@@ -1,4 +1,4 @@
-import { type CanvasNode } from "./types/CanvasNode";
+import { type CanvasPathNode } from "./types/CanvasNode";
 import type { EventListenersContext, InnerListener, OuterListener } from "./types/context/EventListenersContext";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { TwoKeyMap } from "./utils/TwoKeyMap";
@@ -10,7 +10,7 @@ export function useEventListeners(skiaContext: SkiaContext): EventListenersConte
 
     function addHitItemListener(
         event: string,
-        items: CanvasNode | CanvasNode[],
+        items: CanvasPathNode | CanvasPathNode[],
         fn: InnerListener
     ): void {
         if (!Array.isArray(items)) {
@@ -18,7 +18,7 @@ export function useEventListeners(skiaContext: SkiaContext): EventListenersConte
         }
 
         const outerListener = (e: Event) => {
-            const hitItems: CanvasNode[] = [];
+            const hitItems: CanvasPathNode[] = [];
 
             for (const item of items) {
                 const pointerIsInsideItem = item.pathData.path.contains(

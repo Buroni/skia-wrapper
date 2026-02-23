@@ -1,5 +1,5 @@
 import { type Surface, type CanvasKit, type FontMgr } from "canvaskit-wasm";
-import { type CanvasNode } from "../CanvasNode";
+import { type CanvasPathNode } from "../CanvasNode";
 import type { CanvasEdge } from "../CanvasEdge";
 import type { CanvasEntity } from "../CanvasEntity";
 
@@ -24,7 +24,7 @@ export type SkiaContext = {
         worldX: number;
         worldY: number
     };
-    nodes: CanvasNode[];
+    nodes: CanvasPathNode[];
     edges: CanvasEdge[];
     entities: CanvasEntity[];
     numberEntities: number;

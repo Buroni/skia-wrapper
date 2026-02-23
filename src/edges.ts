@@ -1,4 +1,4 @@
-import type { Canvas, Path } from "canvaskit-wasm";
+import type { Path } from "canvaskit-wasm";
 import { isCanvasPathNode, type CanvasNode, type CanvasPathNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
 import type { CanvasEdge } from "./types/CanvasEdge";

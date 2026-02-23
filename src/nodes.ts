@@ -9,7 +9,7 @@ import { useNodeLabel } from "./useNodeLabel";
 import type { ParagraphStyle } from "canvaskit-wasm";
 
 export function useNodes(skiaContext: SkiaContext): NodeContext {
-    const nodePaintContext = usePaint(skiaContext);
+    const paintContext = usePaint(skiaContext);
     const nodeLabelContext = useNodeLabel(skiaContext);
 
     const { surface, displayOrderAddons } = skiaContext;
@@ -55,10 +55,10 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
                 throw new Error("Node stroke and fill must be defined");
             }
 
-            const strokePaint = addDisposable(() => nodePaintContext.setStroke(stroke), disposables);
+            const strokePaint = addDisposable(() => paintContext.setStroke(stroke), disposables);
             canvas.drawPath(node.pathData.path, strokePaint);
 
-            const fillPaint = addDisposable(() => nodePaintContext.setFill(fill), disposables);
+            const fillPaint = addDisposable(() => paintContext.setFill(fill), disposables);
             canvas.drawPath(node.pathData.path, fillPaint);
 
 

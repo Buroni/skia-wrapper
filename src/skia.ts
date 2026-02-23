@@ -1,7 +1,7 @@
 import CanvasKitInit, { type Surface, type CanvasKit } from "canvaskit-wasm";
 import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
 import { type Addon, type DisplayOrderAddon, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
-import type { CanvasNode } from "./types/CanvasNode";
+import type { CanvasPathNode } from "./types/CanvasNode";
 import type { CanvasEntity } from "./types/CanvasEntity";
 
 export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext> {
@@ -13,7 +13,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
     const displayOrderAddons: DisplayOrderAddon[] = [];
 
     const interactions: Interactions = {};
-    const nodes: CanvasNode[] = [];
+    const nodes: CanvasPathNode[] = [];
     const edges: any[] = [];
 
     drawFrame();
