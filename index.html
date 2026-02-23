@@ -100,7 +100,7 @@
                     if (!pendingEdge.sourceNode && !isLastPointerMoveDrag()) {
                         frontNode.style.stroke.color = [1, 0, 0, 1] 
                         pendingEdge.sourceNode = frontNode;
-                        const previewEdge = edgeContext.createPreviewEdge(pendingEdge.sourceNode);
+                        const previewEdge = edgeContext.createPreviewEdge(pendingEdge.sourceNode, { edgeStyle: { stroke: { color: [0, 0, 0, 0.5] }}});
                         toBack(previewEdge);
                     } else if (!pendingEdge.targetNode && !isLastPointerMoveDrag()) {
                         frontNode.style.stroke.color = [1, 0, 0, 1] 

@@ -1,5 +1,5 @@
 import { type EntityStrokeStyle } from "./types/EntityStyle";
-import type { NodePaintContext } from "./types/context/NodePaintContext";
+import type { PaintContext } from "./types/context/PaintContext";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type Paint } from "canvaskit-wasm";
 
@@ -12,7 +12,7 @@ const DEFAULT_FILL_STYLE = {
     color: [1, 1, 1, 1]
 }
 
-export function useNodePaint(skiaContext: SkiaContext): NodePaintContext {
+export function usePaint(skiaContext: SkiaContext): PaintContext {
     const { CanvasKit } = skiaContext;
 
     function setStroke({

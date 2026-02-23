@@ -1,44 +1,72 @@
-import type { Paint } from "canvaskit-wasm";
+import type { Canvas, Path } from "canvaskit-wasm";
 import { isCanvasPathNode, type CanvasNode, type CanvasPathNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
 import type { CanvasEdge } from "./types/CanvasEdge";
+import type { EntityStyle } from "./types/EntityStyle";
+import { addDisposable, getDefaultStyle } from "./utils/utils";
+import { usePaint } from "./paint";
 
 export function useEdges(skiaContext: SkiaContext) {
     const { surface, CanvasKit, displayOrderAddons } = skiaContext;
+    const paintContext = usePaint(skiaContext);
 
     const canvas = surface.getCanvas();
 
-    function createEdge(sourceNode: CanvasPathNode, targetNode: CanvasNode): CanvasEdge {
+    function createEdge(sourceNode: CanvasPathNode, targetNode: CanvasNode, options: { edgeStyle?: EntityStyle, isPreview?: boolean } = {}): CanvasEdge {
+        const edgeStyle = getDefaultStyle(options.edgeStyle);
+        const path = drawEdgePath(sourceNode, targetNode);
+
         const edge: CanvasEdge = {
             type: "edge",
             sourceNode,
             targetNode,
-            displayOrder: skiaContext.numberEntities
+            displayOrder: skiaContext.numberEntities,
+            style: edgeStyle,
+            path
         };
 
-        const drawFrame = () => {
-            const paint = new CanvasKit.Paint();
-            paint.setStyle(CanvasKit.PaintStyle.Stroke);
-            paint.setColor(CanvasKit.Color4f(0, 0, 0, 1));
-            paint.setStrokeWidth(2);
-            paint.setAntiAlias(true);
+        const drawFrame = makeDrawFrame(edge);
 
-            drawEdgePath(edge, paint);
-        };
-
-        displayOrderAddons.push({ entity: edge, addon: drawFrame });
+        displayOrderAddons.push({ entity: edge, addon: drawFrame, isPreview: options?.isPreview });
         skiaContext.edges.push(edge);
 
         return edge;
     }
 
-    function drawEdgePath(edge: CanvasEdge, paint: Paint): void {
-        const { sourceNode, targetNode } = edge;
+    function makeDrawFrame(edge: CanvasEdge): () => void {
+        return () => {
+            const disposables: any[] = [];
 
-        canvas.save();
-        canvas.translate(edge.sourceNode.pathData.cx, edge.sourceNode.pathData.cy);
+            const { stroke, fill } = edge.style;
+            const { path } = edge;
 
-        const path = new CanvasKit.Path();
+            if (!stroke || !fill) {
+                throw new Error("Edge stroke and fill must be defined");
+            }
+
+            canvas.save();
+            canvas.translate(edge.sourceNode.pathData.cx, edge.sourceNode.pathData.cy);
+
+            const strokePaint = addDisposable(() => paintContext.setStroke(stroke), disposables);
+            canvas.drawPath(path, strokePaint);
+
+            const fillPaint = addDisposable(() => paintContext.setFill(fill), disposables);
+            canvas.drawPath(path, fillPaint);
+
+            drawEdgePath(edge.sourceNode, edge.targetNode, path);
+
+            canvas.restore();
+            disposables.forEach(disposable => disposable.delete());
+        };
+    }
+
+    function drawEdgePath(sourceNode: CanvasPathNode, targetNode: CanvasNode, path?: Path): Path {
+        if (path) {
+            path.rewind();
+        } else {
+            path = new CanvasKit.Path();
+        }
+
         path.moveTo(0, 0);
 
         if (isCanvasPathNode(targetNode)) {
@@ -48,34 +76,12 @@ export function useEdges(skiaContext: SkiaContext) {
             path.lineTo(mouse.worldX - sourceNode.pathData.cx, mouse.worldY - sourceNode.pathData.cy);
         }
 
-        canvas.drawPath(path, paint);
-
-        canvas.restore();
-        path.delete();
+        return path;
     }
 
-    function createPreviewEdge(sourceNode: CanvasPathNode): CanvasEdge {
-        const edge: CanvasEdge = {
-            type: "edge",
-            sourceNode,
-            targetNode: { type: "node", displayOrder: 0 },
-            displayOrder: skiaContext.numberEntities
-        }
-
-        const drawFrame = () => {
-            const paint = new CanvasKit.Paint();
-            paint.setStyle(CanvasKit.PaintStyle.Stroke);
-            paint.setColor(CanvasKit.Color4f(0, 0, 0, 1));
-            paint.setStrokeWidth(2);
-            paint.setAntiAlias(true);
-
-            drawEdgePath(edge, paint);
-        };
-
-        displayOrderAddons.push({ entity: edge, addon: drawFrame, isPreview: true });
-        skiaContext.edges.push(edge);
-
-        return edge;
+    function createPreviewEdge(sourceNode: CanvasPathNode, options: { edgeStyle?: EntityStyle, isPreview?: boolean } = {}): CanvasEdge {
+        options = { ...options, isPreview: true };
+        return createEdge(sourceNode, { type: "node", displayOrder: 0 }, options);
     }
 
     return {
