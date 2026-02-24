@@ -72,12 +72,16 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         const entities: CanvasEntity[] = [...nodes, ...edges];
         entities.sort((e1, e2) => e1.displayOrder - e2.displayOrder);
 
-        // if (affectedItem && !displayOrderAddons.some(a => a.entity === affectedItem)) {
-        //     const index = displayOrderAddons.findIndex(n => n === affectedItem.entity);
-        //     displayOrderAddons.splice(index, 1);
-        // }
-
         const indexMap = new Map(entities.map((item, i) => [item, i]));
+
+        const toBeRemoved = displayOrderAddons
+            .map((a, idx) => ({ idx, doRemove: !entities.includes(a.entity) }))
+            .filter(a => a.doRemove);
+        toBeRemoved.sort((a, b) => b.idx - a.idx);
+
+        for (const a of toBeRemoved) {
+            displayOrderAddons.splice(a.idx, 1);
+        }
 
         displayOrderAddons.sort((aObj1, aObj2) => {
             return (indexMap.get(aObj1.entity) ?? Infinity) - (indexMap.get(aObj2.entity) ?? Infinity);

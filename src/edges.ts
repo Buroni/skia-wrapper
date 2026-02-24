@@ -44,6 +44,8 @@ export function useEdges(skiaContext: SkiaContext) {
                 throw new Error("Edge stroke and fill must be defined");
             }
 
+            drawEdgePath(edge.sourceNode, edge.targetNode, path);
+
             canvas.save();
             canvas.translate(edge.sourceNode.pathData.cx, edge.sourceNode.pathData.cy);
 
@@ -52,8 +54,6 @@ export function useEdges(skiaContext: SkiaContext) {
 
             const fillPaint = addDisposable(() => paintContext.setFill(fill), disposables);
             canvas.drawPath(path, fillPaint);
-
-            drawEdgePath(edge.sourceNode, edge.targetNode, path);
 
             canvas.restore();
             disposables.forEach(disposable => disposable.delete());
@@ -84,8 +84,15 @@ export function useEdges(skiaContext: SkiaContext) {
         return createEdge(sourceNode, { type: "node", displayOrder: 0 }, options);
     }
 
+    function deleteEdge(edge: CanvasEdge): void {
+        const idx = skiaContext.edges.findIndex(e => e === edge);
+        skiaContext.edges.splice(idx, 1);
+        skiaContext.syncAddons();
+    }
+
     return {
         createEdge,
-        createPreviewEdge
+        createPreviewEdge,
+        deleteEdge
     };
 }

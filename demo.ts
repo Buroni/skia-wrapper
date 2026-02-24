@@ -8,7 +8,8 @@ import { useNodePaths } from "./src/nodePaths.ts";
 import { useFonts } from "./src/fonts.ts";
 import { useDisplayOrder } from "./src/displayOrder";
 import { setStrokeWidth, setStrokeColor } from "./src/style";
-import type { CanvasPathNode } from "./src/types/CanvasNode.ts";
+import { isCanvasPathNode, type CanvasPathNode } from "./src/types/CanvasNode.ts";
+import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
 
 (async () => {
     const skiaContext = await useSkia("#canvas");
@@ -24,74 +25,75 @@ import type { CanvasPathNode } from "./src/types/CanvasNode.ts";
     const { isLastPointerMoveDrag } = useDragDrop(skiaContext);
     const { circle } = useNodePaths(skiaContext);
 
-    listenerContext.addHitItemListener(
-        "mousemove",
-        skiaContext.nodes,
-        (e, frontNode, hitNodes) => {
-            skiaContext.canvasEl.style.cursor = hitNodes.length ? "pointer" : "default";
+    let pendingEdge: CanvasEdge | null = null;
 
-            if (frontNode) {
-                setStrokeWidth(frontNode, 6);
-            }
+    function onMouseMove(e: Event, frontNode: CanvasPathNode | null, hitNodes: CanvasPathNode[]): void {
+        skiaContext.canvasEl.style.cursor = hitNodes.length ? "pointer" : "default";
 
-            for (const node of skiaContext.nodes) {
-                if (node === frontNode) {
-                    continue;
-                }
-                setStrokeWidth(node, 4);
-            }
+        if (frontNode) {
+            setStrokeWidth(frontNode, 6);
         }
-    );
 
-
-    const pendingEdge: { sourceNode: CanvasPathNode | null, targetNode: CanvasPathNode | null } = { sourceNode: null, targetNode: null };
-
-    listenerContext.addHitItemListener(
-        "pointerup",
-        skiaContext.nodes,
-        (e, frontNode) => {
-            if (!frontNode) {
-                skiaContext.clearPreviews();
-                if (pendingEdge.sourceNode) {
-                    setStrokeColor(pendingEdge.sourceNode, [0, 0, 0, 1]);
-                    pendingEdge.sourceNode = null;
-                }
-                if (pendingEdge.targetNode) {
-                    setStrokeColor(pendingEdge.targetNode, [0, 0, 0, 1]);
-                    pendingEdge.targetNode = null;
-                }
-                return;
+        for (const node of skiaContext.nodes) {
+            if (node === frontNode) {
+                continue;
             }
-
-            if (!pendingEdge.sourceNode && !isLastPointerMoveDrag()) {
-                setStrokeColor(frontNode, [1, 0, 0, 1]);
-                pendingEdge.sourceNode = frontNode;
-                const previewEdge = edgeContext.createPreviewEdge(pendingEdge.sourceNode, { edgeStyle: { stroke: { color: [0, 0, 0, 0.5] } } });
-                toBack(previewEdge);
-            } else if (!pendingEdge.targetNode && !isLastPointerMoveDrag()) {
-                setStrokeColor(frontNode, [1, 0, 0, 1]);
-                pendingEdge.targetNode = frontNode;
-            }
-
-            if (pendingEdge.sourceNode && pendingEdge.targetNode) {
-                skiaContext.clearPreviews();
-
-                const edge = edgeContext.createEdge(pendingEdge.sourceNode, pendingEdge.targetNode);
-
-                setStrokeColor(edge.sourceNode, [0, 0, 0, 1]);
-                setStrokeColor(edge.targetNode, [0, 0, 0, 1]);
-                toBack(edge);
-
-                pendingEdge.sourceNode = null;
-                pendingEdge.targetNode = null;
-            }
+            setStrokeWidth(node, 4);
         }
-    );
+    }
 
-    skiaContext.canvasEl.addEventListener("dblclick", () => {
+    function onDblClick(): void {
         nodeContext.createNode(
             circle(skiaContext.mouse.worldX, skiaContext.mouse.worldY, 50),
             { labelOptions: { text: `${skiaContext.nodes.length}`, fontName: "Roboto", fontSize: 24 } }
         );
-    });
+    }
+
+    function onMouseUp(e: Event, frontNode: CanvasPathNode | null): void {
+        // If clicking outside a node, clear pending edge
+        if (!frontNode) {
+            if (pendingEdge) {
+                edgeContext.deleteEdge(pendingEdge);
+                setStrokeColor(pendingEdge.sourceNode, [0, 0, 0, 1]);
+                setStrokeColor(pendingEdge.targetNode, [0, 0, 0, 1]);
+                pendingEdge = null;
+            }
+            return;
+        }
+
+        if (!isLastPointerMoveDrag()) {
+            setStrokeColor(frontNode, [1, 0, 0, 1]);
+
+            if (!pendingEdge) {
+                pendingEdge = edgeContext.createPreviewEdge(frontNode);
+                toBack(pendingEdge);
+            } else {
+                pendingEdge.targetNode = frontNode;
+            }
+        }
+
+        if (pendingEdge?.sourceNode && isCanvasPathNode(pendingEdge?.targetNode)) {
+            const edge = edgeContext.createEdge(pendingEdge.sourceNode, pendingEdge.targetNode);
+
+            setStrokeColor(edge.sourceNode, [0, 0, 0, 1]);
+            setStrokeColor(edge.targetNode, [0, 0, 0, 1]);
+            toBack(edge);
+
+            skiaContext.clearPreviews();
+        }
+    }
+
+    listenerContext.addHitItemListener(
+        "mousemove",
+        skiaContext.nodes,
+        onMouseMove
+    );
+
+    listenerContext.addHitItemListener(
+        "pointerup",
+        skiaContext.nodes,
+        onMouseUp
+    );
+
+    skiaContext.canvasEl.addEventListener("dblclick", onDblClick);
 })();
