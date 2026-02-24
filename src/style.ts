@@ -1,4 +1,4 @@
-import { isStylable, type CanvasEntity, type Stylable } from "./types/CanvasEntity";
+import { isStylable, type CanvasEntity } from "./types/CanvasEntity";
 
 export function setStrokeWidth(entity: CanvasEntity, width: number): void {
     if (!isStylable(entity)) {

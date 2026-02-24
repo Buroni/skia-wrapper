@@ -1,5 +1,5 @@
 import type { Paragraph, ParagraphStyle, Path, TextAlign } from "canvaskit-wasm";
-import type { CanvasNode } from "./types/CanvasNode";
+import type { CanvasPathNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
 import { addDisposable } from "./utils/utils";
 import type { LabelOptions } from "./types/LabelOptions";
@@ -16,7 +16,7 @@ export function useNodeLabel(skiaContext: SkiaContext) {
 
     const canvas = surface.getCanvas();
 
-    function drawLabel(node: CanvasNode, paragraphStyle: ParagraphStyle, disposables: any[]): void {
+    function drawLabel(node: CanvasPathNode, paragraphStyle: ParagraphStyle, disposables: any[]): void {
         if (!node.labelOptions) {
             throw new Error('labelOptions must be defined on node');
         }

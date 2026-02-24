@@ -34,7 +34,7 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
             setStrokeWidth(frontNode, 6);
         }
 
-        for (const node of skiaContext.nodes) {
+        for (const node of skiaContext.getNodes()) {
             if (node === frontNode) {
                 continue;
             }
@@ -45,7 +45,7 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
     function onDblClick(): void {
         nodeContext.createNode(
             circle(skiaContext.mouse.worldX, skiaContext.mouse.worldY, 50),
-            { labelOptions: { text: `${skiaContext.nodes.length}`, fontName: "Roboto", fontSize: 24 } }
+            { labelOptions: { text: `${skiaContext.getNodes().length}`, fontName: "Roboto", fontSize: 24 } }
         );
     }
 
@@ -78,20 +78,18 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
             setStrokeColor(edge.sourceNode, [0, 0, 0, 1]);
             setStrokeColor(edge.targetNode, [0, 0, 0, 1]);
             toBack(edge);
-
-            skiaContext.clearPreviews();
         }
     }
 
     listenerContext.addHitItemListener(
         "mousemove",
-        skiaContext.nodes,
+        skiaContext.getNodes,
         onMouseMove
     );
 
     listenerContext.addHitItemListener(
         "pointerup",
-        skiaContext.nodes,
+        skiaContext.getNodes,
         onMouseUp
     );
 

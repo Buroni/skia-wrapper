@@ -27,8 +27,8 @@ export function useEdges(skiaContext: SkiaContext) {
 
         const drawFrame = makeDrawFrame(edge);
 
-        displayOrderAddons.push({ entity: edge, addon: drawFrame, isPreview: options?.isPreview });
-        skiaContext.edges.push(edge);
+        displayOrderAddons.set(edge, drawFrame);
+        skiaContext.entities.push(edge);
 
         return edge;
     }
@@ -85,8 +85,8 @@ export function useEdges(skiaContext: SkiaContext) {
     }
 
     function deleteEdge(edge: CanvasEdge): void {
-        const idx = skiaContext.edges.findIndex(e => e === edge);
-        skiaContext.edges.splice(idx, 1);
+        const idx = skiaContext.entities.findIndex(e => e === edge);
+        skiaContext.entities.splice(idx, 1);
         skiaContext.syncAddons();
     }
 

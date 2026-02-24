@@ -10,17 +10,19 @@ export function useEventListeners(skiaContext: SkiaContext): EventListenersConte
 
     function addHitItemListener(
         event: string,
-        items: CanvasPathNode | CanvasPathNode[],
+        items: (CanvasPathNode | CanvasPathNode[]) | (() => CanvasPathNode[]),
         fn: InnerListener
     ): void {
-        if (!Array.isArray(items)) {
+        if (!Array.isArray(items) && typeof items !== "function") {
             items = [items];
         }
 
         const outerListener = (e: Event) => {
             const hitItems: CanvasPathNode[] = [];
 
-            for (const item of items) {
+            const resolvedItems = typeof items === "function" ? items() : items;
+
+            for (const item of resolvedItems as CanvasPathNode[]) {
                 const pointerIsInsideItem = item.pathData.path.contains(
                     skiaContext.mouse.worldX - item.pathData.cx,
                     skiaContext.mouse.worldY - item.pathData.cy

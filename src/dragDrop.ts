@@ -1,4 +1,4 @@
-import { type CanvasNode } from "./types/CanvasNode";
+import { type CanvasPathNode } from "./types/CanvasNode";
 import { InteractionKeys, useInteractionManager } from "./interactionManager";
 import { type SkiaContext } from "./types/context/SkiaContext";
 
@@ -10,7 +10,7 @@ export function useDragDrop(skiaContext: SkiaContext): any {
         hasInteraction
     } = useInteractionManager(skiaContext, InteractionKeys.DRAG_INTERACTION, DRAG_DROP_KEY);
 
-    let dragging: CanvasNode | null = null;
+    let dragging: CanvasPathNode | null = null;
     let dx = 0;
     let dy = 0;
 
@@ -43,7 +43,7 @@ export function useDragDrop(skiaContext: SkiaContext): any {
     }
 
     function hitTest(): void {
-        for (const node of skiaContext.nodes) {
+        for (const node of skiaContext.getNodes()) {
             if (node.pathData.path.contains(
                 skiaContext.mouse.worldX - node.pathData.cx,
                 skiaContext.mouse.worldY - node.pathData.cy)

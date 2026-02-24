@@ -18,17 +18,16 @@ export type SkiaContext = {
     CanvasKit: CanvasKit;
     surface: Surface;
     addons: Addon[];
-    displayOrderAddons: DisplayOrderAddon[];
+    displayOrderAddons: WeakMap<CanvasEntity, () => void>;
     interactions: Interactions;
     mouse: {
         worldX: number;
         worldY: number
     };
-    nodes: CanvasPathNode[];
-    edges: CanvasEdge[];
+    getNodes: () => CanvasPathNode[];
+    getEdges: () => CanvasEdge[];
     entities: CanvasEntity[];
     numberEntities: number;
     fonts: Record<string, FontMgr>;
     syncAddons: () => void;
-    clearPreviews: () => void;
 }

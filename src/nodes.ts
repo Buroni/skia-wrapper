@@ -5,7 +5,7 @@ import { type SkiaContext } from "./types/context/SkiaContext";
 import { type NodeContext } from "./types/context/NodeContext";
 import { usePaint } from "./paint";
 import { addDisposable, getDefaultStyle } from "./utils/utils";
-import { useNodeLabel } from "./useNodeLabel";
+import { useNodeLabel } from "./nodeLabel";
 import type { ParagraphStyle } from "canvaskit-wasm";
 
 export function useNodes(skiaContext: SkiaContext): NodeContext {
@@ -35,9 +35,9 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
 
         const drawFrame = makeDrawFrame(node, paragraphStyle);
 
-        displayOrderAddons.push({ entity: node, addon: drawFrame });
+        displayOrderAddons.set(node, drawFrame);
 
-        skiaContext.nodes.push(node);
+        skiaContext.entities.push(node);
 
         return node;
     }
