@@ -1,6 +1,6 @@
 import CanvasKitInit, { type Surface, type CanvasKit } from "canvaskit-wasm";
 import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
-import { type Addon, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
+import { type Renderer, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
 import { entityIsEdge, entityIsNode, type CanvasEntity } from "./types/CanvasEntity";
 
 export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext> {
@@ -8,8 +8,8 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
     const canvasEl = getCanvasEl();
     const surface = await getSurface();
 
-    const addons: Addon[] = [];
-    const displayOrderAddons = new WeakMap<CanvasEntity, () => void>();
+    const renderers: Renderer[] = [];
+    const entityRenderers = new WeakMap<CanvasEntity, () => void>();
 
     const interactions: Interactions = {};
     const entities: CanvasEntity[] = [];
@@ -50,22 +50,18 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         paint.setStyle(CanvasKit.PaintStyle.Fill);
         canvas.clear(CanvasKit.WHITE);
 
-        addons.forEach(addon => {
-            addon();
+        renderers.forEach(renderer => {
+            renderer();
         });
 
-        // displayOrderAddons.forEach(({ addon }) => {
-        //     addon();
-        // });
-
         entities.forEach(entity => {
-            const addon = displayOrderAddons.get(entity);
+            const renderer = entityRenderers.get(entity);
 
-            if (!addon) {
+            if (!renderer) {
                 throw new Error("Couldn't render entity");
             }
 
-            addon();
+            renderer();
         })
 
         // Clean up
@@ -76,7 +72,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         surface.requestAnimationFrame(drawFrame);
     }
 
-    function syncAddons(): void {
+    function syncDisplayOrders(): void {
         entities.sort((e1, e2) => e1.displayOrder - e2.displayOrder);
     }
 
@@ -88,25 +84,26 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         return entities.filter(entity => entityIsEdge(entity));
     }
 
+    function addEntity(entity: CanvasEntity, renderer: () => void): void {
+        entities.push(entity);
+        entityRenderers.set(entity, renderer);
+    }
 
     return {
         canvasEl,
         CanvasKit,
         surface,
-        addons,
+        renderers,
         interactions,
         mouse: {
             worldX: 0,
             worldY: 0
         },
-        get numberEntities(): number {
-            return entities.length;
-        },
+        addEntity,
         getNodes,
         getEdges,
         entities,
         fonts: {},
-        syncAddons,
-        displayOrderAddons
+        syncDisplayOrders
     }
 }

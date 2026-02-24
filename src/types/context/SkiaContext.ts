@@ -3,11 +3,11 @@ import { type CanvasPathNode } from "../CanvasNode";
 import type { CanvasEdge } from "../CanvasEdge";
 import type { CanvasEntity } from "../CanvasEntity";
 
-export type Addon = () => void;
+export type Renderer = () => void;
 
-export type DisplayOrderAddon = {
+export type DisplayOrderRenderer = {
     entity: CanvasEntity;
-    addon: Addon;
+    renderer: Renderer;
     isPreview?: boolean;
 };
 
@@ -17,17 +17,16 @@ export type SkiaContext = {
     canvasEl: HTMLCanvasElement;
     CanvasKit: CanvasKit;
     surface: Surface;
-    addons: Addon[];
-    displayOrderAddons: WeakMap<CanvasEntity, () => void>;
+    renderers: Renderer[];
     interactions: Interactions;
     mouse: {
         worldX: number;
         worldY: number
     };
+    addEntity: (entity: CanvasEntity, renderer: () => void) => void;
     getNodes: () => CanvasPathNode[];
     getEdges: () => CanvasEdge[];
     entities: CanvasEntity[];
-    numberEntities: number;
     fonts: Record<string, FontMgr>;
-    syncAddons: () => void;
+    syncDisplayOrders: () => void;
 }

@@ -12,7 +12,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
     const paintContext = usePaint(skiaContext);
     const nodeLabelContext = useNodeLabel(skiaContext);
 
-    const { surface, displayOrderAddons } = skiaContext;
+    const { surface } = skiaContext;
 
     const canvas = surface.getCanvas();
 
@@ -25,7 +25,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             pathData,
             style: nodeStyle,
             labelOptions,
-            displayOrder: skiaContext.numberEntities
+            displayOrder: skiaContext.entities.length
         };
 
         let paragraphStyle: ParagraphStyle | undefined;
@@ -34,10 +34,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         }
 
         const drawFrame = makeDrawFrame(node, paragraphStyle);
-
-        displayOrderAddons.set(node, drawFrame);
-
-        skiaContext.entities.push(node);
+        skiaContext.addEntity(node, drawFrame);
 
         return node;
     }

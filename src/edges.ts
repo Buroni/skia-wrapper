@@ -7,7 +7,7 @@ import { addDisposable, getDefaultStyle } from "./utils/utils";
 import { usePaint } from "./paint";
 
 export function useEdges(skiaContext: SkiaContext) {
-    const { surface, CanvasKit, displayOrderAddons } = skiaContext;
+    const { surface, CanvasKit } = skiaContext;
     const paintContext = usePaint(skiaContext);
 
     const canvas = surface.getCanvas();
@@ -20,15 +20,13 @@ export function useEdges(skiaContext: SkiaContext) {
             type: "edge",
             sourceNode,
             targetNode,
-            displayOrder: skiaContext.numberEntities,
+            displayOrder: skiaContext.entities.length,
             style: edgeStyle,
             path
         };
 
         const drawFrame = makeDrawFrame(edge);
-
-        displayOrderAddons.set(edge, drawFrame);
-        skiaContext.entities.push(edge);
+        skiaContext.addEntity(edge, drawFrame);
 
         return edge;
     }
@@ -87,7 +85,6 @@ export function useEdges(skiaContext: SkiaContext) {
     function deleteEdge(edge: CanvasEdge): void {
         const idx = skiaContext.entities.findIndex(e => e === edge);
         skiaContext.entities.splice(idx, 1);
-        skiaContext.syncAddons();
     }
 
     return {

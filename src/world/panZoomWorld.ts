@@ -5,7 +5,7 @@ import { useMouse } from "./mouse";
 export function usePanZoomWorld(skiaContext: SkiaContext) {
     const mouseContext = useMouse(skiaContext);
 
-    const { canvasEl, surface, addons } = skiaContext;
+    const { canvasEl, surface, renderers } = skiaContext;
 
     const PAN_ZOOM_KEY = "PAN_ZOOM_KEY";
     const {
@@ -26,7 +26,7 @@ export function usePanZoomWorld(skiaContext: SkiaContext) {
 
     setupEventListeners();
 
-    addons.push(drawFrame);
+    renderers.push(drawFrame);
 
     function drawFrame() {
         const canvas = surface.getCanvas();
