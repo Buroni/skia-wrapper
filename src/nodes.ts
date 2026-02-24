@@ -33,13 +33,13 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             paragraphStyle = nodeLabelContext.getParagraphStyle(node.labelOptions);
         }
 
-        const drawFrame = makeDrawFrame(node, paragraphStyle);
-        skiaContext.addEntity(node, drawFrame);
+        const renderer = makeRenderer(node, paragraphStyle);
+        skiaContext.addEntity(node, renderer);
 
         return node;
     }
 
-    function makeDrawFrame(node: CanvasPathNode, paragraphStyle?: ParagraphStyle): () => void {
+    function makeRenderer(node: CanvasPathNode, paragraphStyle?: ParagraphStyle): () => void {
         return () => {
             const disposables: any[] = [];
 

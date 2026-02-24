@@ -14,7 +14,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
     const interactions: Interactions = {};
     const entities: CanvasEntity[] = [];
 
-    drawFrame();
+    render();
 
     async function getCanvasKit(): Promise<CanvasKit> {
         return await CanvasKitInit({
@@ -41,7 +41,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         return surface;
     }
 
-    function drawFrame(): void {
+    function render(): void {
         const canvas = surface.getCanvas();
 
         // Clear
@@ -69,7 +69,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         paint.delete();
         surface.flush();
 
-        surface.requestAnimationFrame(drawFrame);
+        surface.requestAnimationFrame(render);
     }
 
     function syncDisplayOrders(): void {

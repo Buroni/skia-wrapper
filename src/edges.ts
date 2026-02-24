@@ -25,13 +25,13 @@ export function useEdges(skiaContext: SkiaContext) {
             path
         };
 
-        const drawFrame = makeDrawFrame(edge);
-        skiaContext.addEntity(edge, drawFrame);
+        const renderer = makeRenderer(edge);
+        skiaContext.addEntity(edge, renderer);
 
         return edge;
     }
 
-    function makeDrawFrame(edge: CanvasEdge): () => void {
+    function makeRenderer(edge: CanvasEdge): () => void {
         return () => {
             const disposables: any[] = [];
 

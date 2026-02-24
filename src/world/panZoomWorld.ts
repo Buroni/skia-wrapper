@@ -26,9 +26,9 @@ export function usePanZoomWorld(skiaContext: SkiaContext) {
 
     setupEventListeners();
 
-    renderers.push(drawFrame);
+    renderers.push(render);
 
-    function drawFrame() {
+    function render() {
         const canvas = surface.getCanvas();
 
         canvas.save();
