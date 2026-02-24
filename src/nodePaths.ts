@@ -7,16 +7,28 @@ export function useNodePaths(skiaContext: SkiaContext): NodePathsContext {
 
     function circle(cx: number, cy: number, r: number): CanvasNodePathData {
         const path = new CanvasKit.Path();
+        path.addCircle(0, 0, r);
 
         return {
-            path: path.addCircle(0, 0, r),
-            cx,
-            cy,
-            r
+            path,
+            translateX: cx,
+            translateY: cy
         };
     }
 
+    function rect(x: number, y: number, width: number, height: number): CanvasNodePathData {
+        const path = new CanvasKit.Path();
+        path.addRect(CanvasKit.XYWHRect(0, 0, width, height));
+
+        return {
+            path,
+            translateX: x,
+            translateY: y
+        }
+    }
+
     return {
-        circle
+        circle,
+        rect
     };
 }

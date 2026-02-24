@@ -44,7 +44,7 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             const disposables: any[] = [];
 
             canvas.save();
-            canvas.translate(node.pathData.cx, node.pathData.cy);
+            canvas.translate(node.pathData.translateX, node.pathData.translateY);
 
             const { stroke, fill } = node.style;
 

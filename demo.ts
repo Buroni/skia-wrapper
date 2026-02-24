@@ -23,7 +23,7 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
 
     usePanZoomWorld(skiaContext);
     const { isLastPointerMoveDrag } = useDragDrop(skiaContext);
-    const { circle } = useNodePaths(skiaContext);
+    const { rect } = useNodePaths(skiaContext);
 
     let pendingEdge: CanvasEdge | null = null;
 
@@ -44,7 +44,7 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
 
     function onDblClick(): void {
         nodeContext.createNode(
-            circle(skiaContext.mouse.worldX, skiaContext.mouse.worldY, 50),
+            rect(skiaContext.mouse.worldX - 25, skiaContext.mouse.worldY - 25, 50, 50),
             { labelOptions: { text: `${skiaContext.getNodes().length}`, fontName: "Roboto", fontSize: 24 } }
         );
     }

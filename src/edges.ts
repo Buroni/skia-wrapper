@@ -45,7 +45,7 @@ export function useEdges(skiaContext: SkiaContext) {
             drawEdgePath(edge.sourceNode, edge.targetNode, path);
 
             canvas.save();
-            canvas.translate(edge.sourceNode.pathData.cx, edge.sourceNode.pathData.cy);
+            canvas.translate(edge.sourceNode.pathData.translateX, edge.sourceNode.pathData.translateY);
 
             const strokePaint = addDisposable(() => paintContext.setStroke(stroke), disposables);
             canvas.drawPath(path, strokePaint);
@@ -68,10 +68,10 @@ export function useEdges(skiaContext: SkiaContext) {
         path.moveTo(0, 0);
 
         if (isCanvasPathNode(targetNode)) {
-            path.lineTo(targetNode.pathData.cx - sourceNode.pathData.cx, targetNode.pathData.cy - sourceNode.pathData.cy);
+            path.lineTo(targetNode.pathData.translateX - sourceNode.pathData.translateX, targetNode.pathData.translateY - sourceNode.pathData.translateY);
         } else {
             const { mouse } = skiaContext;
-            path.lineTo(mouse.worldX - sourceNode.pathData.cx, mouse.worldY - sourceNode.pathData.cy);
+            path.lineTo(mouse.worldX - sourceNode.pathData.translateX, mouse.worldY - sourceNode.pathData.translateY);
         }
 
         return path;

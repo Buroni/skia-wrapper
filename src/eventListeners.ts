@@ -24,8 +24,8 @@ export function useEventListeners(skiaContext: SkiaContext): EventListenersConte
 
             for (const item of resolvedItems as CanvasPathNode[]) {
                 const pointerIsInsideItem = item.pathData.path.contains(
-                    skiaContext.mouse.worldX - item.pathData.cx,
-                    skiaContext.mouse.worldY - item.pathData.cy
+                    skiaContext.mouse.worldX - item.pathData.translateX,
+                    skiaContext.mouse.worldY - item.pathData.translateY
                 );
 
                 if (pointerIsInsideItem) {

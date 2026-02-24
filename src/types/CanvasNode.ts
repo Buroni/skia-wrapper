@@ -5,9 +5,8 @@ import type { CanvasEntity, Stylable } from "./CanvasEntity";
 
 export type CanvasNodePathData = {
     path: Path;
-    cx: number;
-    cy: number;
-    r: number;
+    translateX: number;
+    translateY: number;
 }
 
 export interface CanvasNode extends CanvasEntity {

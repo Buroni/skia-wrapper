@@ -45,8 +45,8 @@ export function useDragDrop(skiaContext: SkiaContext): any {
     function hitTest(): void {
         for (const node of skiaContext.getNodes()) {
             if (node.pathData.path.contains(
-                skiaContext.mouse.worldX - node.pathData.cx,
-                skiaContext.mouse.worldY - node.pathData.cy)
+                skiaContext.mouse.worldX - node.pathData.translateX,
+                skiaContext.mouse.worldY - node.pathData.translateY)
             ) {
                 dragging = node;
             }
@@ -67,8 +67,8 @@ export function useDragDrop(skiaContext: SkiaContext): any {
                 setInteraction();
                 dragStartFn?.(e);
 
-                dx = skiaContext.mouse.worldX - dragging.pathData.cx;
-                dy = skiaContext.mouse.worldY - dragging.pathData.cy;
+                dx = skiaContext.mouse.worldX - dragging.pathData.translateX;
+                dy = skiaContext.mouse.worldY - dragging.pathData.translateY;
             }
         });
 
@@ -78,8 +78,8 @@ export function useDragDrop(skiaContext: SkiaContext): any {
 
                 draggingFn?.(e);
 
-                dragging.pathData.cx = skiaContext.mouse.worldX - dx;
-                dragging.pathData.cy = skiaContext.mouse.worldY - dy;
+                dragging.pathData.translateX = skiaContext.mouse.worldX - dx;
+                dragging.pathData.translateY = skiaContext.mouse.worldY - dy;
             } else {
                 _isLastPointerMoveDrag = false;
             }
