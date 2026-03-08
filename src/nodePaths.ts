@@ -12,7 +12,8 @@ export function useNodePaths(skiaContext: SkiaContext): NodePathsContext {
         return {
             path,
             translateX: cx,
-            translateY: cy
+            translateY: cy,
+            type: "circle"
         };
     }
 
@@ -23,7 +24,8 @@ export function useNodePaths(skiaContext: SkiaContext): NodePathsContext {
         return {
             path,
             translateX: x,
-            translateY: y
+            translateY: y,
+            type: "rect"
         }
     }
 

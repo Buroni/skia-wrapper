@@ -77,10 +77,12 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
     }
 
     function getNodes() {
+        // TODO - optimise
         return entities.filter(entity => entityIsNode(entity));
     }
 
     function getEdges() {
+        // TODO - optimise
         return entities.filter(entity => entityIsEdge(entity));
     }
 

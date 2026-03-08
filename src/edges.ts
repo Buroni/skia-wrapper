@@ -1,10 +1,13 @@
 import type { Path } from "canvaskit-wasm";
-import { isCanvasPathNode, type CanvasNode, type CanvasPathNode } from "./types/CanvasNode";
+import { isCanvasPathNode, type CanvasNode, type CanvasNodePathData, type CanvasPathNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
 import type { CanvasEdge } from "./types/CanvasEdge";
 import type { EntityStyle } from "./types/EntityStyle";
 import { addDisposable, getDefaultStyle } from "./utils/utils";
 import { usePaint } from "./paint";
+import type { Port } from "./types/Port";
+import type { Point } from "./types/Point";
+import { getRelativePortLocation } from "./ports";
 
 export function useEdges(skiaContext: SkiaContext) {
     const { surface, CanvasKit } = skiaContext;
@@ -12,14 +15,14 @@ export function useEdges(skiaContext: SkiaContext) {
 
     const canvas = surface.getCanvas();
 
-    function createEdge(sourceNode: CanvasPathNode, targetNode: CanvasNode, options: { edgeStyle?: EntityStyle, isPreview?: boolean } = {}): CanvasEdge {
+    function createEdge(sourcePort: Port, targetPort: Port, options: { edgeStyle?: EntityStyle } = {}): CanvasEdge {
         const edgeStyle = getDefaultStyle(options.edgeStyle);
-        const path = drawEdgePath(sourceNode, targetNode);
+        const path = drawEdgePath(sourcePort, targetPort);
 
         const edge: CanvasEdge = {
             type: "edge",
-            sourceNode,
-            targetNode,
+            sourcePort,
+            targetPort,
             displayOrder: skiaContext.entities.length,
             style: edgeStyle,
             path
@@ -42,10 +45,10 @@ export function useEdges(skiaContext: SkiaContext) {
                 throw new Error("Edge stroke and fill must be defined");
             }
 
-            drawEdgePath(edge.sourceNode, edge.targetNode, path);
+            drawEdgePath(edge.sourcePort, edge.targetPort, path);
 
             canvas.save();
-            canvas.translate(edge.sourceNode.pathData.translateX, edge.sourceNode.pathData.translateY);
+            canvas.translate(edge.sourcePort.owner.pathData.translateX, edge.sourcePort.owner.pathData.translateY);
 
             const strokePaint = addDisposable(() => paintContext.setStroke(stroke), disposables);
             canvas.drawPath(path, strokePaint);
@@ -58,28 +61,39 @@ export function useEdges(skiaContext: SkiaContext) {
         };
     }
 
-    function drawEdgePath(sourceNode: CanvasPathNode, targetNode: CanvasNode, path?: Path): Path {
+    function drawEdgePath(sourcePort: Port, targetPort: Port, path?: Path): Path {
         if (path) {
             path.rewind();
         } else {
             path = new CanvasKit.Path();
         }
 
-        path.moveTo(0, 0);
+        const sourceNode = sourcePort.owner;
+        const targetNode = targetPort.owner;
+
+        const sourcePortLocation = getRelativePortLocation(sourcePort);
+        const targetPortLocation = getRelativePortLocation(sourcePort);
+
+        path.moveTo(sourcePortLocation.x, sourcePortLocation.y);
 
         if (isCanvasPathNode(targetNode)) {
-            path.lineTo(targetNode.pathData.translateX - sourceNode.pathData.translateX, targetNode.pathData.translateY - sourceNode.pathData.translateY);
+            path.lineTo(
+                (targetNode.pathData.translateX - sourceNode.pathData.translateX) + targetPortLocation.x,
+                (targetNode.pathData.translateY - sourceNode.pathData.translateY) + targetPortLocation.y
+            );
         } else {
             const { mouse } = skiaContext;
-            path.lineTo(mouse.worldX - sourceNode.pathData.translateX, mouse.worldY - sourceNode.pathData.translateY);
+            path.lineTo(
+                (mouse.worldX - sourceNode.pathData.translateX) + targetPortLocation.x,
+                (mouse.worldY - sourceNode.pathData.translateY) + targetPortLocation.y
+            );
         }
 
         return path;
     }
 
-    function createPreviewEdge(sourceNode: CanvasPathNode, options: { edgeStyle?: EntityStyle, isPreview?: boolean } = {}): CanvasEdge {
-        options = { ...options, isPreview: true };
-        return createEdge(sourceNode, { type: "node", displayOrder: 0 }, options);
+    function createPreviewEdge(sourceNode: CanvasPathNode, options: { edgeStyle?: EntityStyle } = {}): CanvasEdge {
+        return createEdge(sourceNode.ports[0], { location: { x: 0.5, y: 0.5 }, owner: { type: "node", displayOrder: 0, pathData: { translateX: 0, translateY: 0 } } }, options);
     }
 
     function deleteEdge(edge: CanvasEdge): void {

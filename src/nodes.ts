@@ -6,11 +6,13 @@ import { type NodeContext } from "./types/context/NodeContext";
 import { usePaint } from "./paint";
 import { addDisposable, getDefaultStyle } from "./utils/utils";
 import { useNodeLabel } from "./nodeLabel";
+import { usePorts } from "./ports";
 import type { ParagraphStyle } from "canvaskit-wasm";
 
 export function useNodes(skiaContext: SkiaContext): NodeContext {
     const paintContext = usePaint(skiaContext);
     const nodeLabelContext = useNodeLabel(skiaContext);
+    const { createCentralPort } = usePorts(skiaContext);
 
     const { surface } = skiaContext;
 
@@ -25,8 +27,11 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             pathData,
             style: nodeStyle,
             labelOptions,
+            ports: [],
             displayOrder: skiaContext.entities.length
         };
+
+        node.ports.push(createCentralPort(node));
 
         let paragraphStyle: ParagraphStyle | undefined;
         if (node.labelOptions) {

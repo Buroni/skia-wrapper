@@ -1,12 +1,12 @@
 import type { Path } from "canvaskit-wasm";
 import type { CanvasEntity, Stylable } from "./CanvasEntity";
-import type { CanvasNode, CanvasPathNode } from "./CanvasNode";
 import type { EntityStyle } from "./EntityStyle";
+import type { Port } from "./Port";
 
 export interface CanvasEdge extends CanvasEntity, Stylable {
     type: "edge";
-    sourceNode: CanvasPathNode;
-    targetNode: CanvasNode;
+    sourcePort: Port;
+    targetPort: Port;
     style: EntityStyle;
     path: Path;
 };

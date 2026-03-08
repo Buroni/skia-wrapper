@@ -8,7 +8,6 @@ export type Renderer = () => void;
 export type DisplayOrderRenderer = {
     entity: CanvasEntity;
     renderer: Renderer;
-    isPreview?: boolean;
 };
 
 export type Interactions = Record<string, { callerId: string | null }>;

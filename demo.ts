@@ -23,7 +23,7 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
 
     usePanZoomWorld(skiaContext);
     const { isLastPointerMoveDrag } = useDragDrop(skiaContext);
-    const { rect } = useNodePaths(skiaContext);
+    const { rect, circle } = useNodePaths(skiaContext);
 
     let pendingEdge: CanvasEdge | null = null;
 
@@ -44,7 +44,7 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
 
     function onDblClick(): void {
         nodeContext.createNode(
-            rect(skiaContext.mouse.worldX - 25, skiaContext.mouse.worldY - 25, 50, 50),
+            circle(skiaContext.mouse.worldX - 25, skiaContext.mouse.worldY - 25, 50, 50),
             { labelOptions: { text: `${skiaContext.getNodes().length}`, fontName: "Roboto", fontSize: 24 } }
         );
     }
@@ -54,8 +54,8 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
         if (!frontNode) {
             if (pendingEdge) {
                 edgeContext.deleteEdge(pendingEdge);
-                setStrokeColor(pendingEdge.sourceNode, [0, 0, 0, 1]);
-                setStrokeColor(pendingEdge.targetNode, [0, 0, 0, 1]);
+                setStrokeColor(pendingEdge.sourcePort.owner, [0, 0, 0, 1]);
+                setStrokeColor(pendingEdge.targetPort.owner, [0, 0, 0, 1]);
                 pendingEdge = null;
             }
             return;
@@ -68,15 +68,15 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
                 pendingEdge = edgeContext.createPreviewEdge(frontNode);
                 toBack(pendingEdge);
             } else {
-                pendingEdge.targetNode = frontNode;
+                pendingEdge.targetPort.owner = frontNode;
             }
         }
 
-        if (pendingEdge?.sourceNode && isCanvasPathNode(pendingEdge?.targetNode)) {
-            const edge = edgeContext.createEdge(pendingEdge.sourceNode, pendingEdge.targetNode);
+        if (pendingEdge?.sourcePort && isCanvasPathNode(pendingEdge?.targetPort.owner)) {
+            const edge = edgeContext.createEdge(pendingEdge.sourcePort, pendingEdge.targetPort);
 
-            setStrokeColor(edge.sourceNode, [0, 0, 0, 1]);
-            setStrokeColor(edge.targetNode, [0, 0, 0, 1]);
+            setStrokeColor(edge.sourcePort.owner, [0, 0, 0, 1]);
+            setStrokeColor(edge.targetPort.owner, [0, 0, 0, 1]);
             toBack(edge);
         }
     }
