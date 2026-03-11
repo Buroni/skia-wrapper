@@ -1,12 +1,11 @@
 import type { Path } from "canvaskit-wasm";
-import { isCanvasPathNode, type CanvasNode, type CanvasNodePathData, type CanvasPathNode } from "./types/CanvasNode";
+import { isCanvasPathNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
 import type { CanvasEdge } from "./types/CanvasEdge";
 import type { EntityStyle } from "./types/EntityStyle";
 import { addDisposable, getDefaultStyle } from "./utils/utils";
 import { usePaint } from "./paint";
 import type { Port } from "./types/Port";
-import type { Point } from "./types/Point";
 import { getRelativePortLocation } from "./ports";
 
 export function useEdges(skiaContext: SkiaContext) {
@@ -72,7 +71,7 @@ export function useEdges(skiaContext: SkiaContext) {
         const targetNode = targetPort.owner;
 
         const sourcePortLocation = getRelativePortLocation(sourcePort);
-        const targetPortLocation = getRelativePortLocation(sourcePort);
+        const targetPortLocation = getRelativePortLocation(targetPort);
 
         path.moveTo(sourcePortLocation.x, sourcePortLocation.y);
 
@@ -92,8 +91,8 @@ export function useEdges(skiaContext: SkiaContext) {
         return path;
     }
 
-    function createPreviewEdge(sourceNode: CanvasPathNode, options: { edgeStyle?: EntityStyle } = {}): CanvasEdge {
-        return createEdge(sourceNode.ports[0], { location: { x: 0.5, y: 0.5 }, owner: { type: "node", displayOrder: 0, pathData: { translateX: 0, translateY: 0 } } }, options);
+    function createPreviewEdge(sourcePort: Port, options: { edgeStyle?: EntityStyle } = {}): CanvasEdge {
+        return createEdge(sourcePort, { location: { x: 0, y: 0 }, owner: { type: "node", displayOrder: 0, pathData: { translateX: 0, translateY: 0 } } }, options);
     }
 
     function deleteEdge(edge: CanvasEdge): void {

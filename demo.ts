@@ -10,12 +10,14 @@ import { useDisplayOrder } from "./src/displayOrder";
 import { setStrokeWidth, setStrokeColor } from "./src/style";
 import { isCanvasPathNode, type CanvasPathNode } from "./src/types/CanvasNode.ts";
 import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
+import { PortLocations, usePorts } from "./src/ports.ts";
 
 (async () => {
     const skiaContext = await useSkia("#canvas");
     const nodeContext = useNodes(skiaContext);
     const edgeContext = useEdges(skiaContext);
     const listenerContext = useEventListeners(skiaContext);
+    const { getClosestPort } = usePorts(skiaContext);
     const { toBack } = useDisplayOrder(skiaContext);
 
     const fontsContext = await useFonts(skiaContext);
@@ -44,7 +46,8 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
 
     function onDblClick(): void {
         nodeContext.createNode(
-            circle(skiaContext.mouse.worldX - 25, skiaContext.mouse.worldY - 25, 50, 50),
+            rect(skiaContext.mouse.worldX - 25, skiaContext.mouse.worldY - 25, 50, 50),
+            [PortLocations.CENTER_BOTTOM, PortLocations.CENTER_RIGHT, PortLocations.CENTER_LEFT, PortLocations.CENTER_TOP],
             { labelOptions: { text: `${skiaContext.getNodes().length}`, fontName: "Roboto", fontSize: 24 } }
         );
     }
@@ -65,10 +68,10 @@ import type { CanvasEdge } from "./src/types/CanvasEdge.ts";
             setStrokeColor(frontNode, [1, 0, 0, 1]);
 
             if (!pendingEdge) {
-                pendingEdge = edgeContext.createPreviewEdge(frontNode);
+                pendingEdge = edgeContext.createPreviewEdge(getClosestPort(frontNode));
                 toBack(pendingEdge);
             } else {
-                pendingEdge.targetPort.owner = frontNode;
+                pendingEdge.targetPort = getClosestPort(frontNode);
             }
         }
 

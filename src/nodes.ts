@@ -6,19 +6,18 @@ import { type NodeContext } from "./types/context/NodeContext";
 import { usePaint } from "./paint";
 import { addDisposable, getDefaultStyle } from "./utils/utils";
 import { useNodeLabel } from "./nodeLabel";
-import { usePorts } from "./ports";
 import type { ParagraphStyle } from "canvaskit-wasm";
+import type { Point } from "./types/Point";
 
 export function useNodes(skiaContext: SkiaContext): NodeContext {
     const paintContext = usePaint(skiaContext);
     const nodeLabelContext = useNodeLabel(skiaContext);
-    const { createCentralPort } = usePorts(skiaContext);
 
     const { surface } = skiaContext;
 
     const canvas = surface.getCanvas();
 
-    function createNode(pathData: CanvasNodePathData, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions } = {}): CanvasPathNode {
+    function createNode(pathData: CanvasNodePathData, portLocations: Point[] | Point, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions } = {}): CanvasPathNode {
         const nodeStyle = getDefaultStyle(options.nodeStyle);
         const labelOptions = getDefaultLabelOptions(options.labelOptions);
 
@@ -31,13 +30,19 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
             displayOrder: skiaContext.entities.length
         };
 
-        node.ports.push(createCentralPort(node));
+        // Assign ports
+        if (!Array.isArray(portLocations)) {
+            portLocations = [portLocations];
+        }
+        portLocations.forEach(location => node.ports.push({ location, owner: node }))
 
+        // Set paragraph style
         let paragraphStyle: ParagraphStyle | undefined;
         if (node.labelOptions) {
             paragraphStyle = nodeLabelContext.getParagraphStyle(node.labelOptions);
         }
 
+        // Set renderer
         const renderer = makeRenderer(node, paragraphStyle);
         skiaContext.addEntity(node, renderer);
 
