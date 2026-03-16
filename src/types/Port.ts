@@ -1,7 +1,12 @@
-import type { CanvasNode } from "./CanvasNode";
+import type { CanvasPathNode } from "./CanvasNode";
 import type { Point } from "./Point";
+import type { CanvasPathData } from "./CanvasPathData";
 
-export type Port = {
+export type NoOwnerPort = {
     location: Point;
-    owner: CanvasNode;
+    decorator?: CanvasPathData;
+}
+
+export type Port = NoOwnerPort & {
+    owner: CanvasPathNode;
 };

@@ -2,6 +2,8 @@ import CanvasKitInit, { type Surface, type CanvasKit } from "canvaskit-wasm";
 import wasmUrl from 'canvaskit-wasm/bin/canvaskit.wasm?url';
 import { type Renderer, type Interactions, type SkiaContext } from "./types/context/SkiaContext";
 import { entityIsEdge, entityIsNode, type CanvasEntity } from "./types/CanvasEntity";
+import type { Port } from "./types/Port";
+import { isCanvasPathNode } from "./types/CanvasNode";
 
 export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext> {
     const CanvasKit = await getCanvasKit();
@@ -10,6 +12,8 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
 
     const renderers: Renderer[] = [];
     const entityRenderers = new WeakMap<CanvasEntity, () => void>();
+
+    const portDecoratorRenderers = new WeakMap<Port, () => void>();
 
     const interactions: Interactions = {};
     const entities: CanvasEntity[] = [];
@@ -62,6 +66,13 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
             }
 
             renderer();
+
+            if (isCanvasPathNode(entity)) {
+                for (const port of entity.ports) {
+                    const portDecoratorRenderer = portDecoratorRenderers.get(port);
+                    portDecoratorRenderer?.();
+                }
+            }
         })
 
         // Clean up
@@ -96,6 +107,7 @@ export async function useSkia(canvasQuerySelector: string): Promise<SkiaContext>
         CanvasKit,
         surface,
         renderers,
+        portDecoratorRenderers,
         interactions,
         mouse: {
             worldX: 0,

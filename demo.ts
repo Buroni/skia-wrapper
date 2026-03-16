@@ -46,8 +46,13 @@ import { PortLocations, usePorts } from "./src/ports.ts";
 
     function onDblClick(): void {
         nodeContext.createNode(
-            rect(skiaContext.mouse.worldX - 25, skiaContext.mouse.worldY - 25, 50, 50),
-            [PortLocations.CENTER_BOTTOM, PortLocations.CENTER_RIGHT, PortLocations.CENTER_LEFT, PortLocations.CENTER_TOP],
+            rect(60, 60, skiaContext.mouse.worldX - 30, skiaContext.mouse.worldY - 30),
+            [
+                { location: PortLocations.CENTER_BOTTOM, decorator: circle(5) },
+                { location: PortLocations.CENTER_RIGHT, decorator: circle(5) },
+                { location: PortLocations.CENTER_LEFT, decorator: rect(6, 6) },
+                { location: PortLocations.CENTER_TOP, decorator: circle(5) },
+            ],
             { labelOptions: { text: `${skiaContext.getNodes().length}`, fontName: "Roboto", fontSize: 24 } }
         );
     }
@@ -81,6 +86,8 @@ import { PortLocations, usePorts } from "./src/ports.ts";
             setStrokeColor(edge.sourcePort.owner, [0, 0, 0, 1]);
             setStrokeColor(edge.targetPort.owner, [0, 0, 0, 1]);
             toBack(edge);
+
+            pendingEdge = null;
         }
     }
 

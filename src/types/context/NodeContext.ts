@@ -1,8 +1,9 @@
-import type { CanvasNodePathData, CanvasPathNode } from "../CanvasNode";
+import type { CanvasPathNode } from "../CanvasNode";
+import type { CanvasPathData } from "../CanvasPathData";
 import type { EntityStyle } from "../EntityStyle";
 import type { LabelOptions } from "../LabelOptions";
-import type { Point } from "../Point";
+import type { NoOwnerPort } from "../Port";
 
 export type NodeContext = {
-    createNode: (pathData: CanvasNodePathData, portLocations: Point[] | Point, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions }) => CanvasPathNode;
+    createNode: (pathData: CanvasPathData, ports: NoOwnerPort[] | NoOwnerPort, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions }) => CanvasPathNode;
 };

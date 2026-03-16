@@ -1,5 +1,5 @@
 import { type LabelOptions } from "./types/LabelOptions";
-import { type CanvasNodePathData, type CanvasPathNode } from "./types/CanvasNode";
+import { type CanvasPathData } from "./types/CanvasPathData";
 import { type EntityStyle } from "./types/EntityStyle";
 import { type SkiaContext } from "./types/context/SkiaContext";
 import { type NodeContext } from "./types/context/NodeContext";
@@ -7,17 +7,20 @@ import { usePaint } from "./paint";
 import { addDisposable, getDefaultStyle } from "./utils/utils";
 import { useNodeLabel } from "./nodeLabel";
 import type { ParagraphStyle } from "canvaskit-wasm";
-import type { Point } from "./types/Point";
+import { usePorts } from "./ports";
+import type { CanvasPathNode } from "./types/CanvasNode";
+import type { NoOwnerPort, Port } from "./types/Port";
 
 export function useNodes(skiaContext: SkiaContext): NodeContext {
     const paintContext = usePaint(skiaContext);
+    const portsContext = usePorts(skiaContext);
     const nodeLabelContext = useNodeLabel(skiaContext);
 
     const { surface } = skiaContext;
 
     const canvas = surface.getCanvas();
 
-    function createNode(pathData: CanvasNodePathData, portLocations: Point[] | Point, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions } = {}): CanvasPathNode {
+    function createNode(pathData: CanvasPathData, ports: NoOwnerPort[] | NoOwnerPort, options: { nodeStyle?: EntityStyle, labelOptions?: LabelOptions } = {}): CanvasPathNode {
         const nodeStyle = getDefaultStyle(options.nodeStyle);
         const labelOptions = getDefaultLabelOptions(options.labelOptions);
 
@@ -31,10 +34,14 @@ export function useNodes(skiaContext: SkiaContext): NodeContext {
         };
 
         // Assign ports
-        if (!Array.isArray(portLocations)) {
-            portLocations = [portLocations];
+        if (!Array.isArray(ports)) {
+            ports = [ports];
         }
-        portLocations.forEach(location => node.ports.push({ location, owner: node }))
+
+        ports.forEach(port => {
+            const portWithOwner: Port = { ...port, owner: node };
+            portsContext.createPort(portWithOwner);
+        });
 
         // Set paragraph style
         let paragraphStyle: ParagraphStyle | undefined;

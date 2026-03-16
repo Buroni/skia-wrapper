@@ -1,6 +1,6 @@
-import type { CanvasNodePathData } from "../CanvasNode";
+import type { CanvasPathData } from "../CanvasPathData";
 
 export type NodePathsContext = {
-    circle: (cx: number, cy: number, r: number) => CanvasNodePathData;
-    rect: (x: number, y: number, width: number, height: number) => CanvasNodePathData;
+    circle: (r: number, cx?: number, cy?: number) => CanvasPathData
+    rect: (width: number, height: number, x?: number, y?: number) => CanvasPathData;
 };

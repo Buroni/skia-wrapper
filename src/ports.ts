@@ -1,3 +1,4 @@
+import { useDecorators } from "./decorators";
 import { isCanvasPathNode, type CanvasPathNode } from "./types/CanvasNode";
 import type { SkiaContext } from "./types/context/SkiaContext";
 import type { Point } from "./types/Point";
@@ -13,6 +14,14 @@ export const PortLocations: Record<string, Point> = {
 };
 
 export function usePorts(skiaContext: SkiaContext) {
+    const portDecoratorContext = useDecorators(skiaContext);
+
+    function createPort(port: Port): void {
+        const node = port.owner;
+        node.ports.push(port);
+        portDecoratorContext.createPortDecorator(port);
+    }
+
     function getClosestPort(node: CanvasPathNode): Port {
         const { worldX, worldY } = skiaContext.mouse;
         const { translateX, translateY } = node.pathData;
@@ -33,6 +42,7 @@ export function usePorts(skiaContext: SkiaContext) {
     }
 
     return {
+        createPort,
         getClosestPort
     };
 }

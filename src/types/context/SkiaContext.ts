@@ -2,6 +2,7 @@ import { type Surface, type CanvasKit, type FontMgr } from "canvaskit-wasm";
 import { type CanvasPathNode } from "../CanvasNode";
 import type { CanvasEdge } from "../CanvasEdge";
 import type { CanvasEntity } from "../CanvasEntity";
+import type { Port } from "../Port";
 
 export type Renderer = () => void;
 
@@ -28,4 +29,5 @@ export type SkiaContext = {
     entities: CanvasEntity[];
     fonts: Record<string, FontMgr>;
     syncDisplayOrders: () => void;
+    portDecoratorRenderers: WeakMap<Port, () => void>;
 }

@@ -1,11 +1,11 @@
-import type { CanvasNodePathData } from "./types/CanvasNode";
+import type { CanvasPathData } from "./types/CanvasPathData";
 import type { NodePathsContext } from "./types/context/NodePathsContext";
 import type { SkiaContext } from "./types/context/SkiaContext";
 
 export function useNodePaths(skiaContext: SkiaContext): NodePathsContext {
     const { CanvasKit } = skiaContext;
 
-    function circle(cx: number, cy: number, r: number): CanvasNodePathData {
+    function circle(r: number, cx = 0, cy = 0): CanvasPathData {
         const path = new CanvasKit.Path();
         path.addCircle(0, 0, r);
 
@@ -17,7 +17,7 @@ export function useNodePaths(skiaContext: SkiaContext): NodePathsContext {
         };
     }
 
-    function rect(x: number, y: number, width: number, height: number): CanvasNodePathData {
+    function rect(width: number, height: number, x = 0, y = 0): CanvasPathData {
         const path = new CanvasKit.Path();
         path.addRect(CanvasKit.XYWHRect(0, 0, width, height));
 
